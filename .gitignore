@@ -1,0 +1,14 @@
+# .nfs*
+
+storage/**/
+!storage/img/netz.png
+# !storage/*.py
+
+# learning/testing python here
+# test
+
+
+
+__pycache__
+.vscode
+.mypy_cache
