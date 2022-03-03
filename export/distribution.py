@@ -26,5 +26,5 @@ def plot(c: Dict[str, int], file: str, solution: Solution) -> None:
 def save(c: Dict[str, int], file: str, solution: Solution) -> None:
 
 	data = np.array([list(c.keys()), list(c.values())], dtype=object)
-	np.save(file.replace("img", "data/img").replace(".png", ""), data)
-	np.save(file.replace("img", "data/img").replace(".png", "_sol"), np.array(solution, dtype=object))
+	np.save(file.replace("img", "data"+ os.sep +"img").replace(".png", ""), data)
+	np.save(file.replace("img", "data"+ os.sep +"img").replace(".png", "_sol"), np.array(solution, dtype=object))

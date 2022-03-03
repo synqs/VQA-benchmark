@@ -31,7 +31,7 @@ def run(thetas: Sequence[float], circuit: QuantumCircuit, backend: BaseBackend) 
 
 def visualize(c: QuantumCircuit, thetas: Sequence[float], file: str) -> QuantumCircuit:
 	the_circuit: QuantumCircuit = c.bind_parameters([round(display, 3) for display in thetas])
-	# np.save(file.replace("img", "data/img").replace(".png", ""), thetas) # is done after the function in benchmark.py
+	# np.save(file.replace("img", "data"+ os.sep +"img").replace(".png", ""), thetas) # is done after the function in benchmark.py
 	the_circuit.draw('mpl', filename=file)
 	plt.close('all')
 	return the_circuit

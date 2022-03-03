@@ -128,6 +128,6 @@ def save(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, O
 		all_runtimes         .append(runtimes)
 
 	all_data: np.typing.NDArray[np.float64] = np.array([all_success_rates, all_average_energies, all_quantum_entropies, all_runtimes], dtype=np.float64)
-	np.save(file.replace("img", "data/img").replace(".png", ""), all_data)
-	np.save(file.replace("img", "data/img").replace(".png", "_all"), np.array([reports, maxP, file], dtype=object))
+	np.save(file.replace("img", "data"+ os.sep +"img").replace(".png", ""), all_data)
+	np.save(file.replace("img", "data"+ os.sep +"img").replace(".png", "_all"), np.array([reports, maxP, file], dtype=object))
 	# return all_data
