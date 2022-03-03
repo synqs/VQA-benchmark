@@ -4,7 +4,7 @@ This tool let's you run variational quantum algorithms (VQAs) to solve optimizat
 
 ## Installation
 
-To create the necessary folders, run `./install.py`.
+To create the necessary folders, run `python3 install.py`.
 On a linux machine, the scripts should run by themselves. On Windows I did not test yet. It may however run with `python3.exe file.py`.
 
 ## Quickstart
