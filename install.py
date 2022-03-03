@@ -24,4 +24,7 @@ executable_files = [
 	'replot.py',
 ]
 for ef in executable_files:
-	os.chmod(ef, stat.S_IXUSR)
+	mode = os.stat(ef).st_mode
+	os.chmod(ef, mode | stat.S_IXUSR)    
+
+
