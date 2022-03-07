@@ -5,8 +5,8 @@ from general.manager  import *
 
 
 options: Dict[str, Union[str, int, float, bool]] = {
-	'problem':		"max_cut",				# max_cut, tsp
-	'size':			"tiny", 				# tiny, small, large
+	'problem':		"max_cut_full",			# max_cut, tsp, max_cut_full, tsp_full # the latter with no classical simplification
+	'size':			"small", 				# tiny, small, large
 	'distances':	1,						# 1, 2, ... (only a few possible)
 	'penalty':		100,  					# penalty for invalid tsp states
 	'pmax':			4,						# maximal number of evolution steps
@@ -20,6 +20,8 @@ options: Dict[str, Union[str, int, float, bool]] = {
 	'print_distributions':	True,			# True, False
 	'print_comparisons':	True,			# True, False
 }
+
+
 
 final_result: int = single_run(options)
 # final_result: int = vary('qAlgorithm', all_options, options)

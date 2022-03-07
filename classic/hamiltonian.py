@@ -16,12 +16,30 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
+	elif problem == "max_cut_all":
+		def func(counts: Dict[str, int], G: nx.Graph) -> float:
+			norm    : int = 0
+			energies: Number = 0
+			for state, times in counts.items():
+				energy: Number = eval_maxcut_all(state, G)
+				energies += energy * times
+				norm     +=          times
+			return energies / norm
 	elif problem == "tsp":
 		def func(counts: Dict[str, int], G: nx.Graph) -> float:
 			norm    : int = 0
 			energies: Number = 0
 			for state, times in counts.items():
 				energy: Number = eval_tsp(state, G, n, penalty)
+				energies += energy * times
+				norm     +=          times
+			return energies / norm
+	elif problem == "tsp_all":
+		def func(counts: Dict[str, int], G: nx.Graph) -> float:
+			norm    : int = 0
+			energies: Number = 0
+			for state, times in counts.items():
+				energy: Number = eval_tsp_all(state, G, n, penalty)
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
@@ -45,12 +63,24 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 # 	return energies / norm
 
 def eval_maxcut(state: str, G: nx.Graph) -> Number:
-	choice: str = '0'+ state
+	choice: str = '0'+ state # TODO also give '1' a try. Maybe it's better...
 	cut: Number = 0
 	for i, j in G.edges():
 		if choice[i] != choice[j]:
 			cut += G[i][j]['weight']
 	return - cut # max cut = min energy
+
+def eval_maxcut_all(state: str, G: nx.Graph) -> Number:
+	choice: str = state
+	cut: Number = 0
+	for i, j in G.edges():
+		if choice[i] != choice[j]:
+			cut += G[i][j]['weight']
+	return - cut # max cut = min energy
+
+def eval_tsp_all(state: str, G: nx.Graph, n: int, factor: Number) -> Number:
+	raise NotImplementedError
+	return 0
 
 def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number) -> Number:
 	K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=np.infty)
@@ -109,7 +139,12 @@ def bits2mat(bitstring: str, n: int) -> NDArray[np.int64]:
 def readState(state: str, problem: str) -> str:
 	if problem == "max_cut":
 		return '0'+ state
+	elif problem == "max_cut_all":
+		return state
 	elif problem == "tsp":
+		return bits2perm(state)
+	elif problem == "tsp_all":
+		raise NotImplementedError
 		return bits2perm(state)
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")

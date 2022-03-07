@@ -17,7 +17,7 @@ def get(size: str, problem: str, distances: Any) -> Tuple[nx.Graph, int, Solutio
 		graph.add_edge(0, 1, weight=1)
 		nx.freeze(graph)
 		n = 2
-		solution = ["01"], -1 if problem == "max_cut" else +2
+		solution = ["01", "10"], -1 if problem.startswith("max_cut") else +2
 	elif size == "small":
 		n, weights, solution = select_weights(problem, distances)
 		graph = get_graph_from_weights(n, weights)
@@ -27,7 +27,7 @@ def get(size: str, problem: str, distances: Any) -> Tuple[nx.Graph, int, Solutio
 		n = len(graph)
 		solution = solutions[problem]
 	else:
-		raise KeyError("Unknown problem '"+ problem +"'.")
+		raise KeyError("Unknown problem size '"+ size +"'.")
 	
 	return graph, n, solution
 
@@ -36,20 +36,20 @@ def select_weights(problem: str, distances: Any) -> Tuple[int, List[List[Union[i
 	n: int = 4
 	weights: List[List[Union[int, float]]]
 	solution: Solution
-	if problem == "max_cut":
+	if problem.startswith("max_cut"):
 		weights = [ [0, 0, 0, 0],
 					[1, 0, 0, 0],
 					[2, 3, 0, 0],
 					[4, 5, 6, 0]]
-		solution = ["0001"], -15
+		solution = ["0001", "1110"], -15
 
 		if distances == 2:
 			weights = [ [0, 0, 0, 0],
 						[1, 0, 0, 0],
 						[3, 2, 0, 0],
 						[6, 5, 4, 0]]
-			solution = ["0011"], -16
-	elif problem == "tsp":
+			solution = ["0011", "1100"], -16
+	elif problem.startswith("tsp"):
 		weights = [ [0, 0, 0, 0],
 					[5, 0, 0, 0],
 					[1, 4, 0, 0],
