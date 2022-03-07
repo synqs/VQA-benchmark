@@ -16,9 +16,9 @@ def design_parameters(problem: str, algorithm: str, p: int, n: int) -> Tuple[int
 		q = n-1
 	elif problem == "tsp":
 		q = (n-1) * (n-1)
-	elif problem == "max_cut_all":
+	elif problem == "max_cut_full":
 		q = n
-	elif problem == "tsp_all":
+	elif problem == "tsp_full":
 		q = n * n
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")
@@ -164,7 +164,7 @@ def QAOA(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: s
 			# for qubit in range(q):
 			# 	circuit.rz(gamma_i * graph[qubit][fixed_node]["weight"], qubit)
 			# 	prev = qubit
-		elif problem == "max_cut_all":
+		elif problem == "max_cut_full":
 			for s, e, d in graph.edges(data='weight'):
 				circuit.rzz(gamma_i * d, s, e)
 		elif problem == "tsp":
@@ -197,7 +197,7 @@ def QAOA(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: s
 			# 		for p in N:
 			# 			objFun += K[i, j] * X[i, prev] * X[j, p]
 			# 			prev = p
-		elif problem == "tsp_all":
+		elif problem == "tsp_full":
 			pass
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)
