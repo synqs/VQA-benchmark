@@ -1,6 +1,8 @@
+from typing import Dict, Iterable
+
 
 all_options: Dict[str, Iterable] = {
-	'problem':		["max_cut", "tsp"],
+	'problem':		["max_cut", "tsp", "max_cut_full", "tsp_full"],
 	'size':			["small", #"large",
 								"tiny"],
 	'distances':	range(1, 3),
