@@ -18,7 +18,7 @@ from general.myTypes import *
 
 
 def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int], Solution, OptimizeResult]:
-	results: List = [] # TODO
+	results: List[Result] = []
 
 	# get some graph
 	G: nx.Graph
