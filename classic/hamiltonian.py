@@ -63,7 +63,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 # 	return energies / norm
 
 def eval_maxcut(state: str, G: nx.Graph) -> Number:
-	choice: str = '0'+ state # TODO also give '1' a try. Maybe it's better...
+	choice: str = '1'+ state[::-1] # TODO also give '1' a try. Maybe it's better...
 	cut: Number = 0
 	for i, j in G.edges():
 		if choice[i] != choice[j]:
@@ -71,7 +71,7 @@ def eval_maxcut(state: str, G: nx.Graph) -> Number:
 	return - cut # max cut = min energy
 
 def eval_maxcut_full(state: str, G: nx.Graph) -> Number:
-	choice: str = state
+	choice: str = state[::-1]
 	cut: Number = 0
 	for i, j in G.edges():
 		if choice[i] != choice[j]:
@@ -84,7 +84,7 @@ def eval_tsp_full(state: str, G: nx.Graph, n: int, factor: Number) -> Number:
 
 def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number) -> Number:
 	K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=np.infty)
-	X: NDArray[np.int64] = bits2mat(state, n)
+	X: NDArray[np.int64] = bits2mat(state[::-1], n)
 	N: range = range(n)
 
 

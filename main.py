@@ -5,20 +5,20 @@ from general.manager  import *
 
 
 options: Dict[str, Union[str, int, float, bool]] = {
-	'problem':		"max_cut_full",			# max_cut, tsp, max_cut_full, tsp_full # the latter with no classical simplification
-	'size':			"small", 				# tiny, small, large
-	'distances':	1,						# 1, 2, ... (only a few possible)
-	'penalty':		100,  					# penalty for invalid tsp states
-	'pmax':			4,						# maximal number of evolution steps
-	'qubase':		"qubit",				# qubit, qudit
-	'd':			10,						# 2, 3, ...
-	'qAlgorithm':	"QAOA",					# VQE_linear, VQE_all, QAOA, WS-QAOA, Grover
-	'hardware':		"qasm_simulator",		# qasm_simulator, statevector_simulator, ibmq_quito
-	'cAlgorithm':	"powell",				# powell, Something_with_gradients?, something_own
-	'x0':			"standard",				# standard (decrease for VQE, linear_annealing for QAOA), decrease, zeros, ones, increase, large, linear_annealing for QAOA
-	'print_circuits':		False,			# True, False
-	'print_distributions':	True,			# True, False
-	'print_comparisons':	True,			# True, False
+	'problem':					"max_cut_full",				# max_cut, tsp, max_cut_full, tsp_full # the latter with no classical simplification
+	'size':						"tiny", 				# tiny, small, large
+	'distances':				1,						# 1, 2, ... (only a few possible)
+	'penalty':					100,  					# penalty for invalid tsp states
+	'pmax':						4,						# maximal number of evolution steps
+	'qubase':					"qubit",				# qubit, qudit
+	'd':						10,						# 2, 3, ...
+	'qAlgorithm':				"QAOA",					# VQE_linear, VQE_all, QAOA, WS-QAOA, Grover
+	'hardware':					"qasm_simulator",		# qasm_simulator, statevector_simulator, ibmq_quito
+	'cAlgorithm':				"powell",				# powell, Something_with_gradients?, something_own
+	'x0':						"standard",				# standard (decrease for VQE, linear_annealing for QAOA), decrease, zeros, ones, increase, large, linear_annealing
+	'print_circuits':			False,					# True, False
+	'print_distributions':		True,					# True, False
+	'print_comparisons':		True,					# True, False
 }
 
 
