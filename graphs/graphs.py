@@ -41,7 +41,7 @@ def select_weights(problem: str, distances: Any) -> Tuple[int, List[List[Union[i
 					[1, 0, 0, 0],
 					[2, 3, 0, 0],
 					[4, 5, 6, 0]]
-		solution = ["0001", "1110"], -15
+		solution = ["1000", "0111"], -15
 
 		if distances == 2:
 			weights = [ [0, 0, 0, 0],
@@ -54,7 +54,7 @@ def select_weights(problem: str, distances: Any) -> Tuple[int, List[List[Union[i
 					[5, 0, 0, 0],
 					[1, 4, 0, 0],
 					[2, 1, 3, 0]]
-		solution = ['0213', '0312'], -8
+		solution = ['0213', '1203'], -8
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")
 	return n, weights, solution

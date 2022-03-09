@@ -238,8 +238,8 @@ def draw_path(G, order):
 solutions = {
 	"tsp":			(["01479BAC86532", "023568CAB9741"], + 123), # test the number again!
 	"tsp_full":		(["01479BAC86532", "023568CAB9741", "and all permutations! TODO: Implement"], + 123), # test the number again!
-	"max_cut":		(["0000001111111"], - 991), # both not proven!
-	"max_cut_full":	(["1111110000000", "0000001111111"], - 991), # both not proven!
+	"max_cut":		(["1111111000000"], - 991), # both not proven!
+	"max_cut_full":	(["1111111000000", "0000000111111"], - 991), # both not proven!
 }
 
 
