@@ -64,7 +64,7 @@ With `options['print_circuit_images']` activated, the program plots the circuit 
 
 ### State distributions
 
-Each quantum computation consists of 1024 shots (TODO: This should be a choosable parameter too.), each measured as a single result. This distribution is then evaluated for its average energy which is then used as the (negative) objective function by a classical optimization algorithm.
+Each quantum computation consists of `options['shots']` shots, by default 1024, each measured as a single result. This distribution is then evaluated for its average energy which is then used as the (negative) objective function by a classical optimization algorithm.
 
 After running, the classical optimizer returns the parameter set that provided the best result. This is then being run again to get an insight into the final distribution of observations (TODO and, in the case of a quantum simulation, the full wave function). This distribution is then stored and (with |options['print_histograms']| activated) displayed in a diagram.
 

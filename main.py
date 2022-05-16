@@ -9,6 +9,7 @@ options: Dict[str, Union[str, int, float, bool]] = {
 	'size':						"tiny", 				# tiny, small, large
 	'distances':				1,						# 1, 2, ... (only a few possible)
 	'penalty':					100,  					# penalty for invalid tsp states
+	'shots':					1024,					# shots per quantum run
 	'pmax':						4,						# maximal number of evolution steps
 	'qubase':					"qubit",				# qubit, qudit
 	'd':						10,						# 2, 3, ...

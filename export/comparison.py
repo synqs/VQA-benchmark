@@ -52,7 +52,9 @@ def plot(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, O
 			print(varied_property +" does not appear in "+ str(properties))
 		known_properties = {'problem': 'problems',
 							'size': 'sizes',
-							'qAlgorithm': 'quantum algorithms'}
+							'qAlgorithm': 'quantum algorithms',
+							'shots': 'shots per simulation',
+						}
 		plural: str
 		try:
 			plural = known_properties[varied_property]

@@ -7,6 +7,7 @@ all_options: Dict[str, Iterable] = {
 								"tiny"],
 	'distances':	range(1, 3),
 	'penalty':		[10, 100, 1000],
+	'shots':		[16, 64, 256, 1024, 16384],
 	# 'pmax':		4,
 	'qubase':		["qubit", "qudit"],
 	'd':			range(2, 12),
