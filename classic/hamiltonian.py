@@ -63,7 +63,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 # 	return energies / norm
 
 def eval_maxcut(state: str, G: nx.Graph) -> Number:
-	choice: str = '1'+ state[::-1] # TODO also give '1' a try. Maybe it's better...
+	choice: str = '0'+ state[::-1] # TODO also give '1' a try. Maybe it's better...
 	cut: Number = 0
 	for i, j in G.edges():
 		if choice[i] != choice[j]:
@@ -164,7 +164,7 @@ def bits2perm(bitstring: str) -> str:
 		# print(linestring)
 		for j in range(line):
 			if int(linestring[j]):
-				stopATtime.append(f'{j:x}')
+				stopATtime.append(int2str(j))
 		if len(stopATtime) == 1:
 			permutation += stopATtime[0]
 		else:
@@ -176,3 +176,35 @@ def bits2perm(bitstring: str) -> str:
 	return permutation + str(line)
 
 #bits2perm(a)
+
+
+# Converts letter digits to higher numbers
+# for numbers equals int(symbol)
+# str2int('A') == 10
+# str2int('B') == 11
+# ...
+def str2int(symbol: str) -> int:
+	assert len(symbol) == 1, "invalid symbol occured"
+	return int(symbol, 36)
+	if symbol.isalpha():
+		return int(symbol.upper(), 36)
+	elif symbol.isnumeric():
+		return int(symbol)
+	else:
+		raise TypeError()
+
+
+
+# Converts higher numbers to letter digits
+# for numbers equals str(num)
+# int2str(10) == 'A'
+# int2str(11) == 'B'
+# ...
+def int2str(num: int) -> str:
+	assert num >= 0, "negative number occured"
+	assert num < 36,  "invalid number occured"
+	if num < 10:
+		return str(num)
+	else:
+		return chr(55 + num)
+
