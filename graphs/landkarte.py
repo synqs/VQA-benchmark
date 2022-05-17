@@ -237,7 +237,7 @@ def draw_path(G, order):
 # tsp = ['HH', 'B', 'L', 'WÜ', 'N', 'M', 'S', 'FR', 'MA', 'F', 'K', 'DO', 'H', 'HH'] # correct solution
 solutions = {
 	"tsp":			(["01479BAC86532", "023568CAB9741"], + 123), # test the number again!
-	"tsp_full":		(["01479BAC86532", "023568CAB9741", "and all permutations! TODO: Implement"], + 123), # test the number again!
+	"tsp_full":		(['023568CAB9741', '23568CAB97410', '3568CAB974102', '568CAB9741023', '68CAB97410235', '8CAB974102356', 'CAB9741023568', 'AB9741023568C', 'B9741023568CA', '9741023568CAB', '741023568CAB9', '41023568CAB97', '1023568CAB974', '01479BAC86532', '1479BAC865320', '479BAC8653201', '79BAC86532014', '9BAC865320147', 'BAC8653201479', 'AC8653201479B', 'C8653201479BA', '8653201479BAC', '653201479BAC8', '53201479BAC86', '3201479BAC865', '201479BAC8653'], + 123), # test the number again!
 	"max_cut":		(["1111111000000"], - 991), # both not proven!
 	"max_cut_full":	(["1111111000000", "0000000111111"], - 991), # both not proven!
 }
