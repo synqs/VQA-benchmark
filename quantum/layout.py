@@ -1,15 +1,18 @@
 from qiskit import QuantumCircuit #, QuantumRegister, ClassicalRegister
 
-from quantum.thetas import Parameters
+from quantum.thetas import *
+from quantum.operation import FakeCircuit
 
 import networkx as nx
+import numpy as np
 
 from typing import Tuple, List
 from typing import Optional, NoReturn
 
 
-def design_parameters(problem: str, algorithm: str, p: int, n: int) -> Tuple[int, int, Parameters]:
+def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: int) -> Tuple[int, int, Parameters]:
 	q: int
+	d: int
 	pars: int
 
 	if problem == "max_cut":
@@ -23,50 +26,80 @@ def design_parameters(problem: str, algorithm: str, p: int, n: int) -> Tuple[int
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")
 	
-	if algorithm.startswith("VQE_"):
-		pars =  (2*p - 1) * q
-		if algorithm.endswith("_linear_rzz") or algorithm.endswith("_linear_rxx"):
-			pars += (p-1) * (q-1)
-		elif algorithm.endswith("_all_rzz") or algorithm.endswith("_all_rxx"):
-			pars += (p-1) * int(q * (q-1) / 2)
-	elif algorithm == "QAOA":
-		pars = 2 * p
-	elif algorithm == "Grover":
-		pass
+	if platform == 'qiskit':
+		
+		if algorithm.startswith("VQE_"):
+			pars =  (2*p - 1) * q
+			if algorithm.endswith("_linear_rzz") or algorithm.endswith("_linear_rxx"):
+				pars += (p-1) * (q-1)
+			elif algorithm.endswith("_all_rzz") or algorithm.endswith("_all_rxx"):
+				pars += (p-1) * int(q * (q-1) / 2)
+		elif algorithm == "QAOA":
+			pars = 2 * p
+		elif algorithm == "Grover":
+			pass
+		else:
+			raise KeyError("Unknown quantum algorithm '"+ algorithm +"'.")
+		
+		theta: Parameters = Parameters_qiskit(pars)
+	elif platform == 'qtip':
+		if algorithm == "QAOA":
+			d = 2**q
+		elif algorithm == "cQAOA":
+			d = np.factorial(q)
+		else:
+			raise NotImplementedError("Quantum algorithm '"+ algorithm +"' not implemented with platform 'qtip'.")
+
+		if algorithm.endswith("QAOA"):
+			pars = 2 * p
+		
+		theta: Parameters = Parameters_sympy (pars)
 	else:
-		raise KeyError("Unknown quantum algorithm '"+ algorithm +"'.")
-	
-	theta: Parameters = Parameters(pars)
+		raise KeyError("Unknown quantum platform '"+ platform +"'.")
 	return q, pars, theta
 
 
-def get_circuit(algorithm: str, p: int, q: int, theta: Parameters, graph: Optional[nx.Graph] = None, problem: Optional[str] = None) -> QuantumCircuit:
-	circuit: QuantumCircuit = QuantumCircuit(q, q)
+def get_circuit(algorithm: str, platform: str, p: int, q: int, theta: Parameters, graph: Optional[nx.Graph] = None, problem: Optional[str] = None) -> QuantumCircuit:
+	if platform == "qiskit":
+		circuit: QuantumCircuit = QuantumCircuit(q, q)
 
-	if algorithm.startswith("VQE_"):
-		VQE(circuit, p, q, theta, algorithm[4:])
-	elif algorithm == "QAOA":
-		assert problem is not None and graph is not None, "QAOA depends on the given problem"
-		QAOA(circuit, p, q, theta, graph, problem, 'classic')
-	elif algorithm == "WS-QAOA":
-		assert problem is not None and graph is not None, "QAOA depends on the given problem"
-		QAOA(circuit, p, q, theta, graph, problem, 'warm-start')
-	elif algorithm == "Grover":
-		Grover(circuit, p, q, theta)
+		if algorithm.startswith("VQE_"):
+			VQE_qiskit(circuit, p, q, theta, algorithm[4:])
+		elif algorithm == "QAOA":
+			assert problem is not None and graph is not None, "QAOA depends on the given problem"
+			QAOA_qiskit(circuit, p, q, theta, graph, problem, 'classic')
+		elif algorithm == "WS-QAOA":
+			assert problem is not None and graph is not None, "QAOA depends on the given problem"
+			QAOA_qiskit(circuit, p, q, theta, graph, problem, 'warm-start')
+		elif algorithm == "Grover":
+			Grover_qiskit(circuit, p, q, theta)
+		else:
+			raise KeyError("Unknown quantum algorithm '"+ algorithm +"'.")
+				
+		for qubit in range(q):
+			circuit.measure(qubit, qubit)
+		
+	elif platform == "qutip":
+		circuit: 
+		if algorithm == "QAOA":
+			assert problem is not None and graph is not None, "QAOA depends on the given problem"
+			QAOA_qutip(circuit, p, q, theta, graph, problem, 'classic')
+		elif algorithm == "cQAOA":
+			assert problem is not None and graph is not None, "QAOA depends on the given problem"
+			QAOA_qutip(circuit, p, q, theta, graph, problem, 'warm-start')
+		else:
+			raise NotImplementedError("Quantum algorithm '"+ algorithm +"' not implemented with platform 'qtip'.")
 	else:
-		raise KeyError("Unknown quantum algorithm '"+ algorithm +"'.")
+		raise KeyError("Unknown quantum platform '"+ platform +"'.")
 	
-	assert theta.is_complete(), (algorithm, p, q, theta, problem)
+	assert theta.is_complete(), ('thetas incomplete. Logs:', algorithm, p, q, theta, problem)
 
-	for qubit in range(q):
-		circuit.measure(qubit, qubit)
-	
 	# circuit.draw('mpl')
 	return circuit
 
 
 
-def VQE(circuit: QuantumCircuit, p: int, q: int, theta: Parameters, style: str) -> None:
+def VQE_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters, style: str) -> None:
 	qubits: range = range(q)
 	# prefix
 	for qubit in qubits:
@@ -130,8 +163,7 @@ def VQE(circuit: QuantumCircuit, p: int, q: int, theta: Parameters, style: str) 
 
 
 
-
-def QAOA(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: str, style: str, start = Optional[List[float]]) -> None:
+def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: str, style: str, start = Optional[List[float]]) -> None:
 	qubits: range = range(q)
 	# prefix
 	if style == "classic":
@@ -243,5 +275,118 @@ def QAOA(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: s
 	# evaluation is done in the calling function
 
 
-def Grover(circuit: QuantumCircuit, p: int, q: int, theta: Parameters) -> NoReturn:
+def QAOA_qutip(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: str, style: str, start = Optional[List[float]]) -> None:
+	qubits: range = range(q)
+	# prefix
+	if style == "classic":
+		for qubit in qubits:
+			circuit.h(qubit)
+	elif style == "warm-start":
+		for qubit in qubits:
+			circuit.rz(start[qubit], qubit)
+	else:
+		raise KeyError("Unknown QAOA style '"+ style +"'.")
+	
+	# repetition
+	fixed_node: int = q
+	for i in range(p):
+		# goal hamiltonian
+		gamma_i = next(theta)
+		if problem == "max_cut":
+			for s, e, d in graph.edges(data='weight'):
+				# print(s, e, d, fixed_node)
+				if s == fixed_node:
+					circuit.rz( gamma_i * d, e)
+				elif e == fixed_node:
+					circuit.rz( gamma_i * d, s)
+				else:
+					circuit.rzz(gamma_i * d, s, e)
+				
+			# for qubit1 in range(q):
+			# 	for qubit2 in range(qubit1+1,q):
+			# 		circuit.rzz(gamma_i * graph[qubit1][qubit2]["weight"], qubit1, qubit2)
+			# for qubit in range(q):
+			# 	circuit.rz(gamma_i * graph[qubit][fixed_node]["weight"], qubit)
+			# 	prev = qubit
+		elif problem == "max_cut_full":
+			for s, e, d in graph.edges(data='weight'):
+				circuit.rzz(gamma_i * d, s, e)
+		elif problem == "tsp":
+			pass
+			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
+			# X: NDArray[np.int64] = bits2mat(state, n)
+			# N: range = range(n)
+
+
+			# s: Number
+			# objFun: Number = 0
+			# # each time exactly one node
+			# for p in N:
+			# 	s = 0
+			# 	for i in N:
+			# 		s += X[i,p]
+			# 	objFun += factor*(s-1)**2
+							
+			# # each node exactly once
+			# for i in N:
+			# 	s = 0
+			# 	for p in N:
+			# 		s += X[i,p]
+			# 	objFun += factor*(s-1)**2
+
+			# # each edge costs its weight
+			# for i in N:
+			# 	for j in N:
+			# 		prev: int = list(N)[-1]
+			# 		for p in N:
+			# 			objFun += K[i, j] * X[i, prev] * X[j, p]
+			# 			prev = p
+		elif problem == "tsp_full":
+			pass
+			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
+			# X: NDArray[np.int64] = bits2mat(state, n)
+			# N: range = range(n)
+
+
+			# s: Number
+			# objFun: Number = 0
+			# # each time exactly one node
+			# for p in N:
+			# 	s = 0
+			# 	for i in N:
+			# 		s += X[i,p]
+			# 	objFun += factor*(s-1)**2
+							
+			# # each node exactly once
+			# for i in N:
+			# 	s = 0
+			# 	for p in N:
+			# 		s += X[i,p]
+			# 	objFun += factor*(s-1)**2
+
+			# # each edge costs its weight
+			# for i in N:
+			# 	for j in N:
+			# 		prev: int = list(N)[-1]
+			# 		for p in N:
+			# 			objFun += K[i, j] * X[i, prev] * X[j, p]
+			# 			prev = p
+		else:
+			raise KeyError("Unknown problem '"+ problem +"'.")
+		# mixing hamiltonian
+		if style == "classic":
+			beta_i = next(theta)
+			for qubit in qubits:
+				circuit.rx(beta_i, qubit)
+		if style == "warm-start":
+			pass
+		else:
+			pass
+	# suffix
+	
+	# evaluation is done in the calling function
+
+
+
+def Grover_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters) -> NoReturn:
 	raise NotImplementedError("Implement Grover algorithm")

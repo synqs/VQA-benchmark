@@ -7,6 +7,7 @@ __all__=[
 	"general",
 	"layout",
 	"circuit",
+	"operation",
 	"thetas",
 
 	#Folders

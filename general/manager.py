@@ -34,10 +34,10 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 		q: int
 		pars: int
 		theta: Parameters
-		q, pars, theta = quantum.layout.design_parameters(options['problem'], options['qAlgorithm'], options['p'], n)
+		q, pars, theta = quantum.layout.design_parameters(options['problem'], options['qAlgorithm'], options['platform'], options['p'], n)
 
 		# create the circuit
-		myCircuit: QuantumCircuit = quantum.layout.get_circuit(options['qAlgorithm'], options['p'], q, theta, G, options['problem'])
+		myCircuit: QuantumCircuit = quantum.layout.get_circuit(options['qAlgorithm'], options['platform'], options['p'], q, theta, G, options['problem'])
 		if options['print_circuits']:
 			myCircuit.draw('mpl', filename=export.storage.files['circuit_thetas'].format(**options))
 			plt.close()
