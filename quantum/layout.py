@@ -5,6 +5,7 @@ from quantum.operation import FakeCircuit
 
 import networkx as nx
 import numpy as np
+from math import factorial
 
 from typing import Tuple, List
 from typing import Optional, NoReturn
@@ -15,13 +16,13 @@ def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: in
 	d: int
 	pars: int
 
-	if problem == "max_cut":
+	if problem == "MCP":
 		q = n-1
-	elif problem == "tsp":
+	elif problem == "TSP":
 		q = (n-1) * (n-1)
-	elif problem == "max_cut_full":
+	elif problem == "MCP_full":
 		q = n
-	elif problem == "tsp_full":
+	elif problem == "TSP_full":
 		q = n * n
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")
@@ -42,18 +43,30 @@ def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: in
 			raise KeyError("Unknown quantum algorithm '"+ algorithm +"'.")
 		
 		theta: Parameters = Parameters_qiskit(pars)
-	elif platform == 'qtip':
+	elif platform == 'qutip':
 		if algorithm == "QAOA":
 			d = 2**q
 		elif algorithm == "cQAOA":
-			d = np.factorial(q)
+			d = factorial(q)
 		else:
-			raise NotImplementedError("Quantum algorithm '"+ algorithm +"' not implemented with platform 'qtip'.")
+			raise NotImplementedError("Quantum algorithm '"+ algorithm +"' not implemented with platform 'qutip'.")
 
 		if algorithm.endswith("QAOA"):
 			pars = 2 * p
 		
-		theta: Parameters = Parameters_sympy (pars)
+		theta: Parameters = Parameters_sympy(pars)
+	elif platform == 'linalg':
+		if algorithm == "QAOA":
+			d = 2**q
+		elif algorithm == "cQAOA":
+			d = factorial(q)
+		else:
+			raise NotImplementedError("Quantum algorithm '"+ algorithm +"' not implemented with platform 'linalg'.")
+
+		if algorithm.endswith("QAOA"):
+			pars = 2 * p
+		
+		theta: None = None
 	else:
 		raise KeyError("Unknown quantum platform '"+ platform +"'.")
 	return q, pars, theta
@@ -80,7 +93,7 @@ def get_circuit(algorithm: str, platform: str, p: int, q: int, theta: Parameters
 			circuit.measure(qubit, qubit)
 		
 	elif platform == "qutip":
-		circuit: 
+		circuit: List
 		if algorithm == "QAOA":
 			assert problem is not None and graph is not None, "QAOA depends on the given problem"
 			QAOA_qutip(circuit, p, q, theta, graph, problem, 'classic')
@@ -180,7 +193,7 @@ def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, pro
 	for i in range(p):
 		# goal hamiltonian
 		gamma_i = next(theta)
-		if problem == "max_cut":
+		if problem == "MCP":
 			for s, e, d in graph.edges(data='weight'):
 				# print(s, e, d, fixed_node)
 				if s == fixed_node:
@@ -196,10 +209,10 @@ def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, pro
 			# for qubit in range(q):
 			# 	circuit.rz(gamma_i * graph[qubit][fixed_node]["weight"], qubit)
 			# 	prev = qubit
-		elif problem == "max_cut_full":
+		elif problem == "MCP_full":
 			for s, e, d in graph.edges(data='weight'):
 				circuit.rzz(gamma_i * d, s, e)
-		elif problem == "tsp":
+		elif problem == "TSP":
 			pass
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)
@@ -229,7 +242,7 @@ def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, pro
 			# 		for p in N:
 			# 			objFun += K[i, j] * X[i, prev] * X[j, p]
 			# 			prev = p
-		elif problem == "tsp_full":
+		elif problem == "TSP_full":
 			pass
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)
@@ -292,7 +305,7 @@ def QAOA_qutip(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, prob
 	for i in range(p):
 		# goal hamiltonian
 		gamma_i = next(theta)
-		if problem == "max_cut":
+		if problem == "MCP":
 			for s, e, d in graph.edges(data='weight'):
 				# print(s, e, d, fixed_node)
 				if s == fixed_node:
@@ -308,10 +321,10 @@ def QAOA_qutip(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, prob
 			# for qubit in range(q):
 			# 	circuit.rz(gamma_i * graph[qubit][fixed_node]["weight"], qubit)
 			# 	prev = qubit
-		elif problem == "max_cut_full":
+		elif problem == "MCP_full":
 			for s, e, d in graph.edges(data='weight'):
 				circuit.rzz(gamma_i * d, s, e)
-		elif problem == "tsp":
+		elif problem == "TSP":
 			pass
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)
@@ -341,7 +354,7 @@ def QAOA_qutip(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, prob
 			# 		for p in N:
 			# 			objFun += K[i, j] * X[i, prev] * X[j, p]
 			# 			prev = p
-		elif problem == "tsp_full":
+		elif problem == "TSP_full":
 			pass
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)

@@ -25,6 +25,6 @@ executable_files = [
 ]
 for ef in executable_files:
 	mode = os.stat(ef).st_mode
-	os.chmod(ef, mode | stat.S_IXUSR)    
+	os.chmod(ef, mode | stat.S_IXUSR)
 
 

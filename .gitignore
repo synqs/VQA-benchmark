@@ -2,12 +2,13 @@
 
 storage/**/
 !storage/img/netz.png
+!storage/img/Medium_solution.png
 # !storage/*.py
 
 # learning/testing python here
-# test
+test
 
-
+eigenvectors.*
 
 __pycache__
 .vscode

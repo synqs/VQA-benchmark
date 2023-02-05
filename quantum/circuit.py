@@ -10,10 +10,10 @@ from typing import Union, Optional
 
 
 
-def run(thetas: Sequence[float], circuit: QuantumCircuit, backend: BaseBackend) -> Dict[str, int]:
+def run(thetas: Sequence[float], circuit: QuantumCircuit, backend: BaseBackend, shots: int) -> Dict[str, int]:
 	circuit_instance: QuantumCircuit = circuit.bind_parameters(thetas)
 	
-	job = backend.run(transpile(circuit_instance, backend))
+	job = backend.run(transpile(circuit_instance, backend), shots=shots)
 	counts: Dict[str, int] = job.result().get_counts()
 	
 	# return dict(sorted(counts.items(), key=lambda item: item[0]))

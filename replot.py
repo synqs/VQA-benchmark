@@ -17,12 +17,12 @@ for image in os.scandir(folder):
 		continue
 	reports, maxP, _ = np.load(image.path.replace("img", "data"+ os.sep +"img").replace(".png", "_all.npy"), allow_pickle=True) # _ = fileName
 	# # print(folder + image, 'reports', maxP, fileName)
-	# exceptions = ['qubit-allqAlgorithm-max_cut-small-4.png', 'qubit-allqAlgorithm-max_cut-tiny-4.png', 'qubit-VQEs-max_cut-large-4.png']
+	# exceptions = ['allqAlgorithm-MCP-small-4.png', 'allqAlgorithm-MCP-tiny-4.png', 'VQEs-MCP-large-4.png']
 	# assert fileName == image.path or image.name in exceptions, (fileName, folder, image.name)
 	# imgTime = - 1645000000 + os.path.getmtime(image.path)
 	# datTime = - 1645000000 + os.path.getmtime(image.path.replace("img", "data"+ os.sep +"img").replace(".png", "_all.npy"))
 
-	if image.name == 'qubit-allqAlgorithm-max_cut-tiny-4.png':
+	if image.name == 'allqAlgorithm-MCP-tiny-4.png':
 		reports = reversed(reports)
 	# print(imgTime, datTime, imgTime - datTime)
 	# # if abs(imgTime - datTime) > 1:

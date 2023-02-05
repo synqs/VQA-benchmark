@@ -13,7 +13,7 @@ def get_start_value(pars: int, style: str, qAlgorithm: Optional[str] = None) -> 
 		assert qAlgorithm, "Default behaviour depends on the quantum algorithm, no algorithm given."
 		if qAlgorithm.startswith("VQE"):
 			return get_start_value(pars, "decrease")
-		elif qAlgorithm.startswith("QAOA"):
+		elif qAlgorithm.startswith("QAOA") or qAlgorithm.startswith("cQAOA"):
 			return get_start_value(pars, "linear_annealing")
 		else:
 			raise KeyError("Unknown quantum algorithm '"+ qAlgorithm +"'.")
@@ -39,8 +39,10 @@ def get_start_value(pars: int, style: str, qAlgorithm: Optional[str] = None) -> 
 def run(func: Callable, x0: ArrayLike, method: str) -> Tuple[OptimizeResult, float]:
 	start: float = clock.time()
 	minimum: OptimizeResult = minimize(func, x0, method=method
-							, options={'xtol': 1e-1, 'disp': True})
+							, options={'xtol': 1e-1, 'disp': False}) # TODO is xtol ok?
 	stop: float = clock.time()
+	duration: float = stop - start
+	print(f"This run took {duration:4.0f} s and resulted in a minimum of {minimum.fun:6.1f}.")
 	return minimum, stop - start
 
 

@@ -64,7 +64,7 @@ class Parameters_sympy:
 		return len(self) == self._countr
 
 	
-Parameters = Union[Parameters_qiskit, Parameters_sympy]
+Parameters = Union[None, Parameters_qiskit, Parameters_sympy]
 
 
 

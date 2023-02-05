@@ -33,9 +33,9 @@ The tool is a modular system which allows choosing several parameters:
 	* Small example (4 nodes)
 	* German railway network (simplified, 13 nodes)
 - Problem
-	* Maximum-cut problem (max-cut)
-	* Travelling salesman problem (tsp)
-	* Transverse field ising model (trafim)
+	* Maximum-cut problem (MCP)
+	* Travelling salesman problem (TSP)
+	<!-- * Transverse field ising model (trafim) -->
 - Quantum information unit
 	* Qubit
 	* Qudit (nothing implemented yet)
@@ -43,7 +43,7 @@ The tool is a modular system which allows choosing several parameters:
 	* VQE with sequential correlation (in multiple flavours, e.g. depending on correlating gate CNOT, CZ, RXX, RZZ, CPhase)
 	* VQE with all-pair   correlation (again in multiple flavours)
 	* QAOA
-	* Grover (nothing implemented yet. What is that actually? does it help?)
+	<!-- * Grover (nothing implemented yet. What is that actually? does it help?) -->
 - Hardware
 	* Classical simulation
 	* IBM quantum machine (not tested yet)

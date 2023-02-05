@@ -16,13 +16,19 @@ folders: Mapping[str, str] = {
 
 
 files: Mapping[str, str] = {
-	# "data":					storage_folder + "data" + os.sep,
-	"circuit_thetas":		folders["circ"] + "{qubase}-{qAlgorithm}-{problem}-{size}-{p}-thetas.png",
-	"circuit_values":		folders["circ"] + "{qubase}-{qAlgorithm}-{problem}-{size}-{p}-values.png",
-	"distributions":		folders["dist"] + "{qubase}-{qAlgorithm}-{problem}-{size}-{p}.png",
-	"comparisons":			folders["comp"] + "{qubase}-{qAlgorithm}-{problem}-{size}-{pmax}.png",
-	# "runtimes": 			folders["runt"] + "{qubase}-{qAlgorithm}-{problem}-{size}-{pmax}.png",
-	"optimal_thetas":		folders["thta"] + "{qubase}-{qAlgorithm}-{problem}-{size}-{p}",
+	#	"data":					storage_folder + "data" + os.sep,
+	#	"circuit_thetas":		folders["circ"] + "{qubase}-{platform}-{qAlgorithm}-{problem}-{size}-{p}-thetas.png",
+	#	"circuit_values":		folders["circ"] + "{qubase}-{platform}-{qAlgorithm}-{problem}-{size}-{p}-values.png",
+	#	"distributions":		folders["dist"] + "{qubase}-{platform}-{qAlgorithm}-{problem}-{size}-{p}.png",
+	#	"comparisons":			folders["comp"] + "{qubase}-{platform}-{qAlgorithm}-{problem}-{size}-{pmax}.png",
+	#	# "runtimes": 			folders["runt"] + "{qubase}-{platform}-{qAlgorithm}-{problem}-{size}-{pmax}.png",
+	#	"optimal_thetas":		folders["thta"] + "{qubase}-{platform}-{qAlgorithm}-{problem}-{size}-{p}",
+
+	"circuit_thetas":		folders["circ"] + "{qAlgorithm}-{problem}-{size}-{p}-thetas.png",
+	"circuit_values":		folders["circ"] + "{qAlgorithm}-{problem}-{size}-{p}-values.png",
+	"distributions":		folders["dist"] + "{qAlgorithm}-{problem}-{size}-{p}.png",
+	"comparisons":			folders["comp"] + "{qAlgorithm}-{problem}-{size}-{pmax}.png",
+	"optimal_thetas":		folders["thta"] + "{qAlgorithm}-{problem}-{size}-{p}",
 }
 
 

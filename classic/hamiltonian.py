@@ -7,7 +7,7 @@ from numpy.typing import ArrayLike, NDArray
 
 
 def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str, int], nx.Graph], float]:
-	if problem == "max_cut":
+	if problem == "MCP":
 		def func(counts: Dict[str, int], G: nx.Graph) -> float:
 			norm    : int = 0
 			energies: Number = 0
@@ -16,7 +16,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
-	elif problem == "max_cut_full":
+	elif problem == "MCP_full":
 		def func(counts: Dict[str, int], G: nx.Graph) -> float:
 			norm    : int = 0
 			energies: Number = 0
@@ -25,7 +25,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
-	elif problem == "tsp":
+	elif problem == "TSP":
 		def func(counts: Dict[str, int], G: nx.Graph) -> float:
 			norm    : int = 0
 			energies: Number = 0
@@ -34,7 +34,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
-	elif problem == "tsp_full":
+	elif problem == "TSP_full":
 		def func(counts: Dict[str, int], G: nx.Graph) -> float:
 			norm    : int = 0
 			energies: Number = 0
@@ -52,9 +52,9 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 # 	norm     = 0
 # 	energies = 0
 # 	for state, times in counts.items():
-# 		if problem == "max_cut":
+# 		if problem == "MCP":
 # 			energy = eval_maxcut(state, G)
-# 		elif problem == "tsp":
+# 		elif problem == "TSP":
 # 			energy = eval_tsp(state, G, n, penalty)
 # 		else:
 # 			raise KeyError("Unknown problem '"+ problem +"'.")
@@ -137,17 +137,17 @@ def bits2mat(bitstring: str, n: int) -> NDArray[np.int64]:
 ###
 
 def readState(state: str, problem: str) -> str:
-	if problem == "max_cut":
+	if problem == "MCP":
 		return '0'+ state
-	elif problem == "max_cut_full":
+	elif problem == "MCP_full":
 		return state
-	elif problem == "tsp":
-		return bits2perm(state)
-	elif problem == "tsp_full":
-		raise NotImplementedError
-		return bits2perm(state)
-	else:
-		raise KeyError("Unknown problem '"+ problem +"'.")
+	elif problem.startswith("TSP"):
+		permutation, next = bits2perm(state)
+		if problem == "TSP":
+			return permutation + next
+		elif problem == "TSP_full":
+			return permutation
+	raise KeyError("Unknown problem '"+ problem +"'.")
 
 def bits2perm(bitstring: str) -> str:
 	line: int = round(np.sqrt(len(bitstring)))
@@ -158,10 +158,10 @@ def bits2perm(bitstring: str) -> str:
 	# print(line)
 
 	permutation: str = ""
-	stopATtime: List[str] = []
 	for i in range(line):
 		linestring = bitstring[i*line:(i+1)*line]
 		# print(linestring)
+		stopATtime: List[str] = []
 		for j in range(line):
 			if int(linestring[j]):
 				stopATtime.append(int2str(j))
@@ -172,8 +172,9 @@ def bits2perm(bitstring: str) -> str:
 	# assert len(permutation) == line, permutation
 
 	# print(permutation)
-	
-	return permutation + str(line)
+	next = int2str(line)
+
+	return permutation, next
 
 #bits2perm(a)
 
@@ -204,7 +205,7 @@ def int2str(num: int) -> str:
 	assert num >= 0, "negative number occured"
 	assert num < 36,  "invalid number occured"
 	if num < 10:
-		return str(num)
+		return chr(48 + num) # = str(num)
 	else:
 		return chr(55 + num)
 

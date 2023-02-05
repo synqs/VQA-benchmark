@@ -132,6 +132,23 @@ full_netz.add_nodes_from(netz.nodes(data=True))
 full_netz_id = nx.Graph()
 full_netz_id.add_nodes_from(netz_id.nodes(data=True))
 
+selected_towns = ['DO', 'L', 'F', 'WÜ', 'N', 'S']
+
+tiny_netz    = nx.Graph()
+tiny_netz_id = nx.Graph()
+
+str_to_tiny_int = {}
+for town in selected_towns:
+	tiny_netz.add_node(town, **netz.nodes()[town])
+
+for i in range(len(selected_towns)):
+	tiny_netz.nodes()[selected_towns[i]]['id'] = i
+	str_to_tiny_int[selected_towns[i]] = i
+
+
+for town in selected_towns:
+	tiny_netz_id.add_node(str_to_tiny_int[town], **tiny_netz.nodes()[town])
+
 for start in netz.nodes():
 	for end in netz.nodes():
 		if end == start:
@@ -145,6 +162,11 @@ for start in netz.nodes():
 		# print(d)
 		full_netz.add_edge(start, end, weight = d, label = d, calculated = True, color = 'w', draw = False, special = False) #, bidirectional=True)
 		full_netz_id.add_edge(str_to_int[start], str_to_int[end], weight = d, label = d, calculated = True, color = 'w', draw = False, special = False)
+		if start in tiny_netz and end in tiny_netz:
+			tiny_netz.add_edge(start, end, weight = d, label = d, calculated = True, color = 'k', draw = True, special = False)
+			tiny_netz_id.add_edge(str_to_tiny_int[start], str_to_tiny_int[end], weight = d, label = d, calculated = True, color = 'k', draw = True, special = False)
+
+
 
 for edge in netz.edges():
 	s, e = edge
@@ -153,6 +175,11 @@ for edge in netz.edges():
 	full_netz[s][e]['draw']  = True
 	full_netz[s][e]['label'] = full_netz[s][e]['weight']
 	# assert full_netz[s][e]['weight'] == netz[s][e]['weight'], edge
+	if (s, e) in tiny_netz.edges():
+		tiny_netz[s][e]['calculated'] = False
+		tiny_netz[s][e]['color'] = 'k'
+		tiny_netz[s][e]['draw']  = True
+		tiny_netz[s][e]['label'] = tiny_netz[s][e]['weight']
 
 for edge in netz_id.edges():
 	s, e = edge
@@ -161,6 +188,11 @@ for edge in netz_id.edges():
 	full_netz_id[s][e]['draw']  = True
 	full_netz_id[s][e]['label'] = full_netz_id[s][e]['weight']
 	# assert full_netz_id[s][e]['weight'] == netz_id[s][e]['weight'], edge
+	if (s, e) in tiny_netz_id.edges():
+		tiny_netz_id[s][e]['calculated'] = False
+		tiny_netz_id[s][e]['color'] = 'k'
+		tiny_netz_id[s][e]['draw']  = True
+		tiny_netz_id[s][e]['label'] = tiny_netz_id[s][e]['weight']
 
 
 def draw_graph(G):
@@ -207,6 +239,8 @@ def draw_graph(G):
 			nx.draw_networkx_edge_labels(G, pos=node_coords, edge_labels={(s,e):G[s][e][edge_label_attribute] for s,e in edges if G[s][e]['special']}, font_color='r')
 		except KeyError:
 			pass
+	plt.show()
+
 
 def reset_graph(G):
 	for s,e in G.edges:
@@ -234,12 +268,20 @@ def draw_path(G, order):
 
 
 
-# tsp = ['HH', 'B', 'L', 'WÜ', 'N', 'M', 'S', 'FR', 'MA', 'F', 'K', 'DO', 'H', 'HH'] # correct solution
+# TSP = ['HH', 'B', 'L', 'WÜ', 'N', 'M', 'S', 'FR', 'MA', 'F', 'K', 'DO', 'H', 'HH'] # correct solution
 solutions = {
-	"tsp":			(["01479BAC86532", "023568CAB9741"], + 123), # test the number again!
-	"tsp_full":		(['023568CAB9741', '23568CAB97410', '3568CAB974102', '568CAB9741023', '68CAB97410235', '8CAB974102356', 'CAB9741023568', 'AB9741023568C', 'B9741023568CA', '9741023568CAB', '741023568CAB9', '41023568CAB97', '1023568CAB974', '01479BAC86532', '1479BAC865320', '479BAC8653201', '79BAC86532014', '9BAC865320147', 'BAC8653201479', 'AC8653201479B', 'C8653201479BA', '8653201479BAC', '653201479BAC8', '53201479BAC86', '3201479BAC865', '201479BAC8653'], + 123), # test the number again!
-	"max_cut":		(["1111111000000"], - 991), # both not proven!
-	"max_cut_full":	(["1111111000000", "0000000111111"], - 991), # both not proven!
+	"TSP":			(["01479BAC86532", "023568CAB9741"], + 123), # test the number again!
+	"TSP_full":		(['023568CAB9741', '23568CAB97410', '3568CAB974102', '568CAB9741023', '68CAB97410235', '8CAB974102356', 'CAB9741023568', 'AB9741023568C', 'B9741023568CA', '9741023568CAB', '741023568CAB9', '41023568CAB97', '1023568CAB974', '01479BAC86532', '1479BAC865320', '479BAC8653201', '79BAC86532014', '9BAC865320147', 'BAC8653201479', 'AC8653201479B', 'C8653201479BA', '8653201479BAC', '653201479BAC8', '53201479BAC86', '3201479BAC865', '201479BAC8653'], + 123), # test the number again!
+	"MCP":		(["1111111000000"], - 991), # both not proven!
+	"MCP_full":	(["1111111000000", "0000000111111"], - 991), # both not proven!
+}
+
+# TSP = ['DO', 'L', 'N', 'WÜ', 'F', 'S', 'DO'] # correct solution
+tiny_solutions = {
+	"TSP":			(["014325", "052341"], + 103),
+	"TSP_full":		(['014325', '143250', '432501', '325014', '250143', '501432', '052341', '523410', '234105', '341052', '410523', '105234'], + 103),
+	"MCP":		(["001101"], - 179),
+	"MCP_full":	(["001101", "110010"], - 179),
 }
 
 
@@ -247,3 +289,5 @@ nx.freeze(netz)
 nx.freeze(netz_id)
 nx.freeze(full_netz)
 nx.freeze(full_netz_id)
+nx.freeze(tiny_netz)
+nx.freeze(tiny_netz_id)

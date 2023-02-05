@@ -15,7 +15,7 @@ from general.myTypes import QuantumCircuit, Solution, Number, Result
 
 
 
-def evaluate(optimizer_result: Any, counts: Dict[str, int], circuit: QuantumCircuit, solution: Solution, runtime: float) -> Result:
+def evaluate(optimizer_result: Any, counts: Dict[str, int], circuit: Optional[QuantumCircuit], solution: Solution, runtime: float) -> Result:
 	success_rate: Optional[Number]		= None
 	average_energy: Number				= 0
 	quantum_entropy: Optional[Number]	= None
@@ -32,7 +32,8 @@ def evaluate(optimizer_result: Any, counts: Dict[str, int], circuit: QuantumCirc
 			if state in best_inputs:
 				success_rate += rate
 		success_rate /= sum(counts.values())
-		average_energy = (best_energy - average_energy) / abs(best_energy) + 1
+		# average_energy /= best_energy
+		average_energy = 1 - (average_energy - best_energy) / abs(best_energy)
 		# average_energy -= best_energy
 
 

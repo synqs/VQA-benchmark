@@ -3,6 +3,7 @@ from qutip import Qobj
 from sympy import Symbol
 
 from typing import List, Union, NoReturn
+from quantum.thetas import Parameters_qiskit
 
 class FakeCircuit:
 	_operators: List[Qobj]
