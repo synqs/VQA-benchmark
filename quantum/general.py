@@ -1,5 +1,5 @@
 from qiskit import BasicAer
-from qiskit.providers.basebackend import BaseBackend
+from general.myTypes import BaseBackend
 
 
 
