@@ -1,7 +1,10 @@
 import networkx as nx
 
 from qiskit.circuit import Parameter
-from qiskit.providers.basebackend import BaseBackend
+try:
+	from qiskit.providers.basebackend import BaseBackend
+except ModuleNotFoundError:
+	from qiskit.providers.backend import Backend as BaseBackend
 from qiskit import QuantumCircuit
 
 from scipy.optimize.optimize import OptimizeResult
