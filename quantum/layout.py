@@ -1,7 +1,7 @@
 from qiskit import QuantumCircuit #, QuantumRegister, ClassicalRegister
 
 from quantum.thetas import *
-from quantum.operation import FakeCircuit
+# from quantum.operation import FakeCircuit
 
 import networkx as nx
 import numpy as np
@@ -213,7 +213,7 @@ def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, pro
 			for s, e, d in graph.edges(data='weight'):
 				circuit.rzz(gamma_i * d, s, e)
 		elif problem == "TSP":
-			pass
+			raise NotImplementedError
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)
 			# N: range = range(n)
@@ -243,7 +243,7 @@ def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, pro
 			# 			objFun += K[i, j] * X[i, prev] * X[j, p]
 			# 			prev = p
 		elif problem == "TSP_full":
-			pass
+			raise NotImplementedError
 			# K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=0)
 			# X: NDArray[np.int64] = bits2mat(state, n)
 			# N: range = range(n)

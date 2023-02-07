@@ -1,27 +1,27 @@
-from qutip import Qobj
+# from qutip import Qobj
 
 from sympy import Symbol
 
 from typing import List, Union, NoReturn
 from quantum.thetas import Parameters_qiskit
 
-class FakeCircuit:
-	_operators: List[Qobj]
+# class FakeCircuit:
+# 	_operators: List[Qobj]
 
-	def __init__(self):
-		self._operators = []
+# 	def __init__(self):
+# 		self._operators = []
 
-	def __len__(self):
-		return len(self._operators)
+# 	def __len__(self):
+# 		return len(self._operators)
 
-	def draw(self):
-		return False
+# 	def draw(self):
+# 		return False
 	
-	def run(self) -> List:
-		return _operators
+# 	def run(self) -> List:
+# 		return _operators
 	
-	def append(self, new_item: Qobj) -> NoReturn:
-		_operators.append(new_item)
+# 	def append(self, new_item: Qobj) -> NoReturn:
+# 		_operators.append(new_item)
 
 	
 class Parameters_sympy:
