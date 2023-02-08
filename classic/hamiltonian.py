@@ -78,7 +78,7 @@ def eval_maxcut_full(state: str, G: nx.Graph) -> Number:
 			cut += G[i][j]['weight']
 	return - cut # max cut = min energy
 
-def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number, full = False) -> Number:
+def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number, full: bool = False) -> Number:
 	K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight') #, nonedge=np.infty)
 	if full:
 		X: NDArray[np.int64] = bits2mat_full(state[::-1], n)
