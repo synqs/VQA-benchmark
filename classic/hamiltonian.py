@@ -30,7 +30,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 			norm    : int = 0
 			energies: Number = 0
 			for state, times in counts.items():
-				energy: Number = eval_tsp(state, G, n, penalty)
+				energy: Number = eval_tsp(state, G, n, penalty, False)
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
@@ -39,7 +39,7 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 			norm    : int = 0
 			energies: Number = 0
 			for state, times in counts.items():
-				energy: Number = eval_tsp_full(state, G, n, penalty)
+				energy: Number = eval_tsp(state, G, n, penalty, True)
 				energies += energy * times
 				norm     +=          times
 			return energies / norm
@@ -78,13 +78,12 @@ def eval_maxcut_full(state: str, G: nx.Graph) -> Number:
 			cut += G[i][j]['weight']
 	return - cut # max cut = min energy
 
-def eval_tsp_full(state: str, G: nx.Graph, n: int, factor: Number) -> Number:
-	raise NotImplementedError
-	return 0
-
-def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number) -> Number:
-	K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight', nonedge=np.infty)
-	X: NDArray[np.int64] = bits2mat(state[::-1], n)
+def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number, full = False) -> Number:
+	K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight') #, nonedge=np.infty)
+	if full:
+		X: NDArray[np.int64] = bits2mat_full(state[::-1], n)
+	else:
+		X: NDArray[np.int64] = bits2mat(state[::-1], n)
 	N: range = range(n)
 
 
@@ -124,6 +123,16 @@ def bits2mat(bitstring: str, n: int) -> NDArray[np.int64]:
 	for i in range(line):
 		table.append(bitstring[i*line:(i+1)*line] +'0')
 	table.append('0'*(n-1) + '1')
+
+	return np.matrix([[int(symbol) for symbol in line] for line in table]).T
+
+def bits2mat_full(bitstring: str, n: int) -> NDArray[np.int64]:
+	line: int = n
+	assert len(bitstring) == line * line
+
+	table: List[str] = []
+	for i in range(line):
+		table.append(bitstring[i*line:(i+1)*line])
 
 	return np.matrix([[int(symbol) for symbol in line] for line in table]).T
 
