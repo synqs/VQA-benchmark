@@ -85,7 +85,7 @@ def plot(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, O
 	
 
 	fig.suptitle((v_properties.capitalize() +' in ' if vlen else '') + ' - '.join(properties))
-	fig.supxlabel('Number of quantum circuit layers', fontsize=MEDIUM_SIZE)
+	fig.supxlabel('Number of quantum circuit layers $p$', fontsize=MEDIUM_SIZE)
 	ax1.set_title('Success rates',             pad=12)
 	ax2.set_title('Normalized average energy', pad=12)
 	# ax3.set_title('More parameters',         pad=12)
