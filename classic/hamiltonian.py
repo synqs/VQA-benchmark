@@ -2,49 +2,28 @@ import networkx as nx
 import numpy    as np
 
 from typing import Callable, Dict, List
-from general.myTypes import Number
+from general.myTypes import Number, Choice
 from numpy.typing import ArrayLike, NDArray
-
+from pyparsing import nested_expr
 
 def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str, int], nx.Graph], float]:
-	if problem == "MCP":
-		def func(counts: Dict[str, int], G: nx.Graph) -> float:
-			norm    : int = 0
-			energies: Number = 0
-			for state, times in counts.items():
-				energy: Number = eval_maxcut(state, G)
-				energies += energy * times
-				norm     +=          times
-			return energies / norm
-	elif problem == "MCP_full":
-		def func(counts: Dict[str, int], G: nx.Graph) -> float:
-			norm    : int = 0
-			energies: Number = 0
-			for state, times in counts.items():
-				energy: Number = eval_maxcut_full(state, G)
-				energies += energy * times
-				norm     +=          times
-			return energies / norm
+	decode   : Callable[[str], Choice] = readState(problem, n)
+	evaluator: Callable[[Choice, nx.Graph], Number]
+	if problem.startswith("MCP"):
+		evaluator = eval_maxcut
 	elif problem == "TSP":
-		def func(counts: Dict[str, int], G: nx.Graph) -> float:
-			norm    : int = 0
-			energies: Number = 0
-			for state, times in counts.items():
-				energy: Number = eval_tsp(state, G, n, penalty, False)
-				energies += energy * times
-				norm     +=          times
-			return energies / norm
-	elif problem == "TSP_full":
-		def func(counts: Dict[str, int], G: nx.Graph) -> float:
-			norm    : int = 0
-			energies: Number = 0
-			for state, times in counts.items():
-				energy: Number = eval_tsp(state, G, n, penalty, True)
-				energies += energy * times
-				norm     +=          times
-			return energies / norm
+		evaluator = evaluator_tsp(n, penalty)
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")
+
+	def func(counts: Dict[str, int], G: nx.Graph) -> float:
+		norm    : int = 0
+		energies: Number = 0
+		for state, times in counts.items():
+			energy: Number = evaluator(decode(state), G)
+			energies += energy * times
+			norm     +=          times
+		return energies / norm
 	return func
 
 # def expval(c, G, problem, penalty):
@@ -62,104 +41,87 @@ def get_expval_func(problem: str, n: int, penalty: Number) -> Callable[[Dict[str
 # 		norm     +=          times
 # 	return energies / norm
 
-def eval_maxcut(state: str, G: nx.Graph) -> Number:
-	choice: str = '0'+ state[::-1] # TODO also give '1' a try. Maybe it's better...
+def eval_maxcut(choice: str, G: nx.Graph) -> Number:
 	cut: Number = 0
 	for i, j in G.edges():
 		if choice[i] != choice[j]:
 			cut += G[i][j]['weight']
 	return - cut # max cut = min energy
 
-def eval_maxcut_full(state: str, G: nx.Graph) -> Number:
-	choice: str = state[::-1]
-	cut: Number = 0
-	for i, j in G.edges():
-		if choice[i] != choice[j]:
-			cut += G[i][j]['weight']
-	return - cut # max cut = min energy
-
-def eval_tsp(state: str, G: nx.Graph, n: int, factor: Number, full: bool = False) -> Number:
-	K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight') #, nonedge=np.infty)
-	if full:
-		X: NDArray[np.int64] = bits2mat_full(state[::-1], n)
-	else:
-		X: NDArray[np.int64] = bits2mat(state[::-1], n)
-	N: range = range(n)
+def evaluator_tsp(n: int, factor: Number) -> Callable[[NDArray[np.int64], nx.Graph], Number]:
+	def eval_tsp(X: NDArray[np.int64], G: nx.Graph) -> Number:
+		K: NDArray[np.float64] = nx.to_numpy_matrix(G, weight='weight') #, nonedge=np.infty)
+		N: range = range(n)
 
 
-	s: Number
-	objFun: Number = 0
-	# each time exactly one node
-	for p in N:
-		s = 0
-		for i in N:
-			s += X[i,p]
-		objFun += factor*(s-1)**2
-					
-	# each node exactly once
-	for i in N:
-		s = 0
+		s: Number
+		objFun: Number = 0
+		# each time exactly one node
 		for p in N:
-			s += X[i,p]
-		objFun += factor*(s-1)**2
-
-	# each edge costs its weight
-	for i in N:
-		for j in N:
-			prev: int = list(N)[-1]
+			s = 0
+			for i in N:
+				s += X[i,p]
+			objFun += factor*(s-1)**2
+						
+		# each node exactly once
+		for i in N:
+			s = 0
 			for p in N:
-				objFun += K[i, j] * X[i, prev] * X[j, p]
-				prev = p
+				s += X[i,p]
+			objFun += factor*(s-1)**2
 
-	return objFun
+		# each edge costs its weight
+		for i in N:
+			for j in N:
+				prev: int = list(N)[-1]
+				for p in N:
+					objFun += K[i, j] * X[i, prev] * X[j, p]
+					prev = p
 
-
-
-def bits2mat(bitstring: str, n: int) -> NDArray[np.int64]:
-	line: int = n-1
-	assert len(bitstring) == line * line
-
-	table: List[str] = []
-	for i in range(line):
-		table.append(bitstring[i*line:(i+1)*line] +'0')
-	table.append('0'*(n-1) + '1')
-
-	return np.matrix([[int(symbol) for symbol in line] for line in table]).T
-
-def bits2mat_full(bitstring: str, n: int) -> NDArray[np.int64]:
-	line: int = n
-	assert len(bitstring) == line * line
-
-	table: List[str] = []
-	for i in range(line):
-		table.append(bitstring[i*line:(i+1)*line])
-
-	return np.matrix([[int(symbol) for symbol in line] for line in table]).T
-
-#bits2mat(a)
+		return objFun
+	return eval_tsp
 
 
+def bits2mat_callable(full: bool, n: int) -> Callable[[str], NDArray[np.int64]]:
+	def bits2mat(state: str) -> NDArray[np.int64]:
+		line: int = n if full else n-1
+		assert len(state) == line * line
+
+		bitstring = state[::-1]
+		table: List[str] = []
+		for i in range(line):
+			table.append(bitstring[i*line:(i+1)*line] +('' if full else '0'))
+		if not full:
+			table.append('0'*(n-1) + '1')
+
+		return np.matrix([[int(symbol) for symbol in line] for line in table])
+	return bits2mat
 
 
-####
-# This function transforms the state into a readable variant.
-###
 
-def readState(state: str, problem: str) -> str:
-	if problem == "MCP":
-		return '0'+ state
-	elif problem == "MCP_full":
-		return state
+
+
+def readState(problem: str, n: int) -> Callable[[str], Choice]:
+	full = problem.endswith("_full")
+	if problem.startswith("MCP"):
+		return lambda state: state[::-1] + ('' if full else '0') # TODO also give '1' a try. Maybe it's better...
 	elif problem.startswith("TSP"):
-		permutation, next = bits2perm(state)
-		if problem == "TSP":
-			return permutation + next
-		elif problem == "TSP_full":
-			return permutation
+		return bits2mat_callable(full, n)
 	raise KeyError("Unknown problem '"+ problem +"'.")
 
-def bits2perm(bitstring: str) -> str:
-	line: int = round(np.sqrt(len(bitstring)))
+"""This function transforms the state into a readable variant."""
+def prettyState(problem: str, bitstring: str, n: int) -> str:
+	choice: Choice = readState(problem, n)(bitstring)
+	if problem.startswith("MCP"):
+		return choice
+	elif problem.startswith("TSP"):
+		return mat2perm(choice)
+	raise KeyError("Unknown problem '"+ problem +"'.")
+
+def mat2perm(binary_table: NDArray[np.int64]) -> str:
+	lines: Tuple[int, int] = binary_table.shape
+	assert lines[0] == lines[1], "Rectangular binary table"
+	line = lines[0]
 	# line = n-1
 	
 	# print(bitstring)
@@ -167,23 +129,61 @@ def bits2perm(bitstring: str) -> str:
 	# print(line)
 
 	permutation: str = ""
-	for i in range(line):
-		linestring = bitstring[i*line:(i+1)*line]
-		# print(linestring)
-		stopATtime: List[str] = []
-		for j in range(line):
-			if int(linestring[j]):
-				stopATtime.append(int2str(j))
-		if len(stopATtime) == 1:
-			permutation += stopATtime[0]
+	for column in binary_table.T:
+		stop_at_time: List[str] = []
+		for k in range(line):
+			if linestring[k]:
+				stop_at_time.append(int2str(j))
+		if len(stop_at_time) == 1:
+			permutation += stop_at_time[0]
 		else:
-			permutation += '('+ ''.join(stopATtime) +')'
+			permutation += '('+ ''.join(stop_at_time) +')'
 	# assert len(permutation) == line, permutation
 
 	# print(permutation)
-	next = int2str(line)
+	# next = int2str(line)
 
-	return permutation, next
+	return permutation# , next
+
+def perm2mat(permutation: str) -> NDArray[np.int64]:
+	# lines: Tuple[int, int] = binary_table.shape
+	# line = n-1
+	
+	# print(bitstring)
+	# print(len(bitstring))
+	# print(line)
+
+	columns = []
+	cursor  = 0
+	inbrack = False
+	for letter in permutation:
+		if letter == "(":
+			inbrack = True
+			currcol = []
+		elif letter == ")":
+			columns.append(currcol)
+			inbrack = False
+		else:
+			row = str2int(letter)
+			if inbrack:
+				currcol.append(row)
+			else:
+				columns.append([row])
+	
+	line = len(columns)
+	emptyCol = np.zeros(line, dtype=int)
+
+	npCols = []
+	for column in columns:
+		npCol = emptyCol.copy()
+		for row in column:
+			npCol[row] = 1
+		npCols.append(npCol)
+
+
+	return np.array(npCols).T
+
+
 
 #bits2perm(a)
 

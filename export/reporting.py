@@ -43,14 +43,13 @@ def evaluate(optimizer_result: Any, counts: Dict[str, int], circuit: Optional[Qu
 
 
 
-def prettify(chaos_counts: Dict[str, int], problem: str) -> Dict[str, int]:
+def prettify(chaos_counts: Dict[str, int], problem: str, n: int) -> Dict[str, int]:
 	# return dict(sorted(chaos_counts.items(), key=lambda item: item[0]))
-
 	names : Iterable[str] = sorted(chaos_counts)
 	# values: List[int] = []
 	counts: Dict[str, int] = {}
 	for i in names:
 		# values.append(chaos_counts[i])
-		counts[classic.hamiltonian.readState(i, problem)] = chaos_counts[i]
+		counts[classic.hamiltonian.prettyState(problem, i, n)] = chaos_counts[i]
 
 	return counts

@@ -1,3 +1,4 @@
+import numpy as np
 import networkx as nx
 
 from qiskit.circuit import Parameter
@@ -19,6 +20,7 @@ from quantum.thetas import Parameters
 
 
 Number			= Union[int, float]
+Choice			= Union[str, NDArray[np.int64]]
 
 AllOptions		= Dict
 Options			= Dict

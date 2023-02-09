@@ -62,7 +62,7 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 			np.save(export.storage.files['optimal_thetas'].format(**options), res['x'])
 			
 			raw_counts: Dict[str, int] = quantum.circuit.run(res['x'], myCircuit, quantum.general.get_backend(options['hardware']), options['shots'])
-			counts: Dict[str, int] = export.reporting.prettify(raw_counts, options['problem'])
+			counts: Dict[str, int] = export.reporting.prettify(raw_counts, options['problem'], nodes)
 		elif options['platform'] == 'linalg':
 			# calculate the number of qubits, and generate generic parameters
 			# nodes = min(nodes, 6)
