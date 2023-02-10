@@ -6,7 +6,7 @@ import classic.hamiltonian
 import numpy as np
 
 
-from general.myTypes import nx, QuantumCircuit, BaseBackend, csr
+from general.myTypes import nx, QuantumCircuit, BaseBackend, csr, NDArray
 from typing import Dict, Sequence, Callable, Tuple
 
 
@@ -22,10 +22,10 @@ def get_process(G: nx.Graph, circuit: QuantumCircuit, n: int, problem: str, hard
 		return energy
 	return process
 
-def get_process_linalg(G: nx.Graph, quantum_objects: Tuple[Tuple[np.array, np.array], np.array, np.array], p: int, n: int, problem: str) -> Callable[[Sequence[float]], float]:
+def get_process_linalg(G: nx.Graph, quantum_objects: Tuple[Tuple[NDArray, NDArray], NDArray, NDArray], p: int, n: int, problem: str) -> Callable[[Sequence[float]], float]:
 	Hmix, Hprob, init = quantum_objects
 	def process(thetas: Sequence[float]) -> float:
-		state: np.array = quantum.explicit.run(thetas, Hmix, Hprob, init, p)
+		state: NDArray = quantum.explicit.run(thetas, Hmix, Hprob, init, p)
 		energy: float   = quantum.explicit.get_expectation_value(state, Hprob)
 		return energy
 	return process

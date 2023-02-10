@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from typing import Dict, List, Tuple, Iterable
+from typing import Dict, List, Tuple
 from typing import Union, Optional
 from general.myTypes import Solution, Number, Result, OptimizeResult
 
@@ -13,7 +13,7 @@ from general.myTypes import Solution, Number, Result, OptimizeResult
 # Update: the following should be mostly replaced by the replot.py TODO update bash command
 # To see your changes while debugging you can open an image (./storage/img/compare/QAOA-MCP-small-distances-4.png) and run the following in bash:
 # while sleep 1; do if [ "./storage/img/compare/QAOA-MCP-small-distances-4.png" -ot export/comparison.py ]; then echo -n "and again "; if python3.9 -c 'import numpy as np; from export.comparison import plot; reports, maxP, fileName = np.load("./storage/data/img/compare/QAOA-MCP-small-distances-4_all.npy", allow_pickle=True); plot(reports, maxP, fileName)'; then echo 'a new plot is done'; else echo 'this failed'; sleep 14; fi; fi; done
-def plot(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, OptimizeResult], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]]]], maxP: int, file: str) -> None:
+def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, OptimizeResult], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]]]], maxP: int, file: str) -> None:
 	# plt.style.use('Solarize_Light2')
 
 	SMALL_SIZE  = 28
@@ -58,7 +58,7 @@ def plot(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, O
 			properties.remove(varied_property)
 		except ValueError:
 			print(varied_property +" does not appear in "+ str(properties))
-			file: str = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
+			file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
 		known_properties = {'cAlgorithm':	'classical optimizers',
 							'distances':	'graphs',
 							'hardware':		'hardware',
@@ -127,13 +127,13 @@ def plot(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, O
 	plt.close(fig)
 
 
-def save(reports: Iterable[Tuple[Tuple[List[Result], Dict[str, int], Solution, OptimizeResult], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]]]], maxP: int, file: str) -> None:
+def save(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, OptimizeResult], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]], Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]]]], maxP: int, file: str) -> None:
 
 	properties: List[str] = file.split(os.sep)[-1].replace('.png', '').split('-')[:-1]
 	varied: Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]] = reports[0][2]
 	for varied_property in varied:
 		if varied_property not in properties:
-			file: str = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
+			file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
 
 	all_success_rates    : List[List[Optional[Number]]] = []
 	all_average_energies : List[List[Optional[Number]]] = []

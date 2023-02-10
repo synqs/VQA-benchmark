@@ -6,11 +6,11 @@ from general.manager  import *
 
 options: Dict[str, Union[str, int, float, bool]] = {
 	'problem':					"MCP",				# MCP, TSP, MCP_full, TSP_full # the latter with no classical simplification
-	'size':						"medium", 				# tiny, small, medium, large
+	'size':						"small", 				# tiny, small, medium, large
 	'distances':				1,						# 1, 2 (only possible for small)
 	'penalty':					100,  					# penalty for invalid tsp states
 	'shots':					1024,					# shots per quantum run
-	'pmax':						16,						# maximal number of evolution steps
+	'pmax':						4,						# maximal number of evolution steps
 	'qubase':					"qubit",				# qubit, qudit (not implemented)
 	'd':						10,						# 2, 3, ...
 	'platform':					"qiskit",				# qiskit (circuit), linalg (matrices), qutip (matrices), sympy (formula for expec. value)
@@ -26,7 +26,7 @@ options: Dict[str, Union[str, int, float, bool]] = {
 
 
 # final_result: int = single_run(options)
-final_result: int = vary('qAlgorithm', all_options, options)
+final_result: int = vary('problem', all_options, options)
 # final_result: int = vary(('qAlgorithm', 'size'), all_options, options, how_many=2)
 
 # print(final_result)

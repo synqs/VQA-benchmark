@@ -11,10 +11,11 @@ from typing import Tuple, List
 from typing import Optional, NoReturn
 
 
-def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: int) -> Tuple[int, int, Parameters]:
-	q: int
+def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: int) -> Tuple[Optional[int], int, Optional[Parameters]]:
+	q: Optional[int]
 	d: int
 	pars: int
+	theta: Optional[Parameters]
 
 	if problem == "MCP":
 		q = n-1
@@ -42,7 +43,7 @@ def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: in
 		else:
 			raise KeyError("Unknown quantum algorithm '"+ algorithm +"'.")
 		
-		theta: Parameters = Parameters_qiskit(pars)
+		theta = Parameters_qiskit(pars)
 	# elif platform == 'qutip':
 	# 	if algorithm == "QAOA":
 	# 		d = 2**q
@@ -66,7 +67,7 @@ def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: in
 		if algorithm.endswith("QAOA"):
 			pars = 2 * p
 		
-		theta: None = None
+		theta = None
 	else:
 		raise KeyError("Unknown quantum platform '"+ platform +"'.")
 	return q, pars, theta
@@ -74,6 +75,7 @@ def design_parameters(problem: str, algorithm: str, platform: str, p: int, n: in
 
 def get_circuit(algorithm: str, platform: str, p: int, q: int, theta: Parameters, graph: Optional[nx.Graph] = None, problem: Optional[str] = None) -> QuantumCircuit:
 	if platform == "qiskit":
+		assert isinstance(theta, Parameters_qiskit)
 		circuit: QuantumCircuit = QuantumCircuit(q, q)
 
 		if algorithm.startswith("VQE_"):
@@ -112,7 +114,7 @@ def get_circuit(algorithm: str, platform: str, p: int, q: int, theta: Parameters
 
 
 
-def VQE_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters, style: str) -> None:
+def VQE_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters_qiskit, style: str) -> None:
 	qubits: range = range(q)
 	# prefix
 	for qubit in qubits:
@@ -176,7 +178,7 @@ def VQE_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters, style
 
 
 
-def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, problem: str, style: str, start = Optional[List[float]]) -> None:
+def QAOA_qiskit(circuit, p: int, q: int, theta: Parameters_qiskit, graph: nx.Graph, problem: str, style: str, start = Optional[List[float]]) -> None:
 	qubits: range = range(q)
 	# prefix
 	if style == "classic":
@@ -293,5 +295,5 @@ def QAOA_qutip(circuit, p: int, q: int, theta: Parameters, graph: nx.Graph, prob
 
 
 
-def Grover_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters) -> NoReturn:
+def Grover_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters_qiskit) -> NoReturn:
 	raise NotImplementedError("Implement Grover algorithm")

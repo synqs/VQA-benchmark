@@ -6,9 +6,10 @@ import sympy
 
 import networkx as nx
 from typing import Tuple, List, Sequence, Callable
+from numpy.typing import NDArray
 
 
-def tsp_problem_hamiltonian(n: int, basis: List[Tuple], G: nx.Graph, problem: str) -> np.array:
+def tsp_problem_hamiltonian(n: int, basis: List[Tuple], G: nx.Graph, problem: str) -> NDArray:
 	nfac = len(basis)
 	
 	diagonals = []
@@ -29,7 +30,7 @@ def tsp_problem_hamiltonian(n: int, basis: List[Tuple], G: nx.Graph, problem: st
 	return np.array(diagonals)
 
 
-def tsp_problem_unitary(diagonals: np.array) -> Callable[[float], sparse.csr_matrix]:
+def tsp_problem_unitary(diagonals: NDArray) -> Callable[[float], sparse.csr_matrix]:
 	nfac = len(diagonals)
 	x = sympy.Symbol("λ")
 
@@ -44,7 +45,7 @@ def tsp_problem_unitary(diagonals: np.array) -> Callable[[float], sparse.csr_mat
 
 
 
-def tsp_mixer_unitary(n: int, basis: List[Tuple]) -> Callable[[float], sparse.csr_matrix]: # , top_down: bool = False
+def tsp_mixer_unitary(n: int, basis: List[Tuple]) -> Tuple[NDArray, NDArray]: # , top_down: bool = False
 	# for permutation in itertools.permutations(range(n)):
 	# 	perm = np.array(permutation)
 	# 	basis.append(perm)
@@ -52,7 +53,7 @@ def tsp_mixer_unitary(n: int, basis: List[Tuple]) -> Callable[[float], sparse.cs
 	nfac = len(basis)
 	# nfac = basis(n)
 
-	Hamiltonian: np.array = np.zeros((nfac, nfac))
+	Hamiltonian: NDArray = np.zeros((nfac, nfac))
 
 	# nonzero = []
 	for k in range(nfac):
@@ -149,12 +150,12 @@ def tsp_mixer_unitary(n: int, basis: List[Tuple]) -> Callable[[float], sparse.cs
 
 
 # minimum of the negative Hamiltonian
-def tsp_initial(n: int, basis: List[Tuple]) -> np.array:
+def tsp_initial(n: int, basis: List[Tuple]) -> NDArray:
 	nfac = factorial(n)
 	return np.ones(nfac) / np.sqrt(nfac)
 
 
-# def tsp_initial(n: int, basis: List[Tuple]) -> np.array:
+# def tsp_initial(n: int, basis: List[Tuple]) -> NDArray:
 # 	nfac = factorial(n)
 # 	signs = []
 # 	for perm in basis:
@@ -168,7 +169,7 @@ def tsp_initial(n: int, basis: List[Tuple]) -> np.array:
 
 
 
-def run(thetas: Sequence[float], Hmix: Tuple[np.array, np.array], Hprob: np.array, init: np.array, p: int) -> np.array:
+def run(thetas: Sequence[float], Hmix: Tuple[NDArray, NDArray], Hprob: NDArray, init: NDArray, p: int) -> NDArray:
 	# Umix @ Uprob @ ... @ Uprob @ init
 	# Hmix = Vmix @ np.diag(Λmix) @ Vmix.T
 
@@ -187,7 +188,7 @@ def run(thetas: Sequence[float], Hmix: Tuple[np.array, np.array], Hprob: np.arra
 	return current
 
 
-def get_expectation_value(state: np.array, Hprob: np.array) -> float:
+def get_expectation_value(state: NDArray, Hprob: NDArray) -> float:
 	scalar_product = np.vdot(state, Hprob * state)
 	assert np.isclose(np.imag(scalar_product), 0, atol= 10**(-6)), "non-hermitian Hprob"
 	return np.real(scalar_product)
