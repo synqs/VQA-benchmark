@@ -1,8 +1,10 @@
+import classic.hamiltonian
+
 import networkx as nx
 
 from typing import List, Tuple, Union, Optional, Any
 
-from general.myTypes import Solution
+from general.myTypes import Solution, Number
 
 
 def get(size: str, problem: str, distances: int = 1) -> Tuple[nx.Graph, int, Solution]:
@@ -34,6 +36,20 @@ def get(size: str, problem: str, distances: int = 1) -> Tuple[nx.Graph, int, Sol
 	else:
 		raise KeyError("Unknown problem size '"+ size +"'.")
 	
+	sol_set, sol_val = solution
+	energy: Number
+	# dtrans: str # double translated
+	for sol in sol_set:
+		if problem.startswith("MCP"):
+			energy = classic.hamiltonian.eval_maxcut(sol, graph)
+			# dtrans = sol
+		elif problem.startswith("TSP"):
+			energy = classic.hamiltonian.evaluator_tsp(n, 123456)(classic.hamiltonian.perm2mat(sol), graph)
+			assert classic.hamiltonian.mat2perm(classic.hamiltonian.perm2mat(sol)) == sol
+		else:
+			raise KeyError("Unknown problem '"+ problem +"'.")
+		assert energy == sol_val, (energy, sol_val)
+
 	return graph, n, solution
 
 
@@ -46,7 +62,7 @@ def select_weights(problem: str, distances: int) -> Tuple[int, List[List[Union[i
 					[1, 0, 0, 0],
 					[2, 3, 0, 0],
 					[4, 5, 6, 0]]
-		solution = ["1000", "0111"], -15
+		solution = ["1110", "0001"], -15
 
 		if distances == 2:
 			weights = [ [0, 0, 0, 0],
@@ -59,7 +75,7 @@ def select_weights(problem: str, distances: int) -> Tuple[int, List[List[Union[i
 					[5, 0, 0, 0],
 					[1, 4, 0, 0],
 					[2, 1, 3, 0]]
-		solution = ['0213', '1203'], +8
+		solution = ['0213', '1203', '2130', '1302', '3021', '2031', '0312', '3120'], +8
 	else:
 		raise KeyError("Unknown problem '"+ problem +"'.")
 	return n, weights, solution
