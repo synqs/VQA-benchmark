@@ -146,12 +146,7 @@ def mat2perm(binary_table: np.matrix) -> str:
 	return permutation# , next
 
 def perm2mat(permutation: str) -> np.matrix:
-	# lines: Tuple[int, int] = binary_table.shape
-	# line = n-1
-	
-	# print(bitstring)
-	# print(len(bitstring))
-	# print(line)
+	# print(permutation)
 
 	columns: List[List[int]] = []
 	currcol: List[int]

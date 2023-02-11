@@ -124,12 +124,12 @@ def VQE_qiskit(circuit: QuantumCircuit, p: int, q: int, theta: Parameters_qiskit
 	prev: int
 	for i in range(p-1):
 		# entanglement
-		if style == "qiskit_linear":
+		if style == "linear_cnot":
 			prev = 0
 			for qubit in range(1,q):
 				circuit.cx(prev, qubit)
 				prev = qubit
-		elif style == "qiskit_all":
+		elif style == "all_cnot":
 			for qubit1 in range(q):
 				for qubit2 in range(qubit1+1,q):
 					circuit.cx(qubit1, qubit2)

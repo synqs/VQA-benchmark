@@ -32,13 +32,17 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 		options['p'] = pMinusOne + 1
 		# options['p'] = options['pmax'] # for running a single value only
 
+		qAlgorithm: str = options['qAlgorithm']
+		if qAlgorithm == 'VQE':
+			qAlgorithm = 'VQE_linear_rzz'
+
 		# calculate the number of qubits, and generate generic parameters
 		q: Optional[int]
 		theta: Optional[Parameters]
-		q, pars, theta = quantum.layout.design_parameters(options['problem'], options['qAlgorithm'], options['platform'], options['p'], nodes)
+		q, pars, theta = quantum.layout.design_parameters(options['problem'], qAlgorithm, options['platform'], options['p'], nodes)
 		
 		# Sample reasonable starting values
-		x0: NDArray = classic.optimization.get_start_value(pars, options['x0'], options['qAlgorithm'])
+		x0: NDArray = classic.optimization.get_start_value(pars, options['x0'], qAlgorithm)
 
 		process: Callable[[Sequence[float]], float]
 		res: OptimizeResult
@@ -52,7 +56,7 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 			assert isinstance(theta, Parameters_qiskit)
 
 			# create the circuit
-			myCircuit: QuantumCircuit = quantum.layout.get_circuit(options['qAlgorithm'], options['platform'], options['p'], q, theta, G, options['problem'])
+			myCircuit: QuantumCircuit = quantum.layout.get_circuit(qAlgorithm, options['platform'], options['p'], q, theta, G, options['problem'])
 			if options['print_circuits']:
 				myCircuit.draw('mpl', filename=export.storage.files['circuit_thetas'].format(**options))
 				plt.close()
