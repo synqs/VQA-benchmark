@@ -16,6 +16,10 @@ class Parameters_qiskit:
 		self._thetas = []
 		for i in range(intended_length):
 			self._thetas.append(Parameter(f'$\\theta_{{{i}}}$'))
+			# if i % 2:
+			# 	self._thetas.append(Parameter(f'$\\beta_{{{int(i/2)}}}$'))
+			# else:
+			# 	self._thetas.append(Parameter(f'$\\gamma_{{{int(i/2)}}}$'))
 
 	def __len__(self):
 		assert self._length == len(self._thetas), "self._length = "+ self._length +", but len(self._thetas) = "+ len(self._thetas)
@@ -25,7 +29,7 @@ class Parameters_qiskit:
 		return self
 	def __next__(self) -> Parameter:
 		if self._countr >= self._length:
-			raise KeyError("Two many Parameters used")
+			raise KeyError("Too many Parameters used")
 		n: Parameter = self._thetas[self._countr]
 		self._countr += 1
 		return n
