@@ -1,5 +1,6 @@
 from graphs import graphs
 import quantum.layout
+import classic.hamiltonian
 import classic.hybrid
 import classic.optimization
 import quantum.circuit
@@ -35,6 +36,13 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 		qAlgorithm: str = options['qAlgorithm']
 		if qAlgorithm == 'VQE':
 			qAlgorithm = 'VQE_linear_rzz'
+
+		if qAlgorithm == 'cQAOA' and options['platform'] == 'qiskit': # fix diagram description
+			qAlgorithm = 'VQE_linear_rzz'
+			options['qAlgorithm'] = 'VQE'
+		if qAlgorithm == 'VQE' and options['platform'] == 'linalg':   # restore correct value if necessary
+			qAlgorithm = 'cQAOA'
+			options['qAlgorithm'] = 'cQAOA'
 
 		# calculate the number of qubits, and generate generic parameters
 		q: Optional[int]
@@ -80,24 +88,27 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 			# nodes = min(nodes, 6)
 			# q: int
 			full: bool = options['problem'].endswith('_full')
-			if not full:
-				nodes -= 1
-
+			n = nodes - int(not full)
 
 
 			# create the necessary operators to repeat
-			basis = list(itertools.permutations(range(nodes)))
-			Hmix:  Tuple[np.ndarray, np.ndarray] = quantum.explicit.tsp_mixer_unitary(nodes, basis)
-			Hprob: np.ndarray                    = quantum.explicit.tsp_problem_hamiltonian(nodes, basis, G, options['problem'])
+			basis = list(itertools.permutations(range(n)))
+			Λmix:  NDarray
+			Vmix:  NDarray
+			d_tm: float # diagonalization time
+			Λmix, Vmix, d_tm               = quantum.explicit.tsp_mixer_unitary(n, basis)
+			Hprob: NDarray                 = quantum.explicit.tsp_problem_hamiltonian(nodes, basis, G, full)
+			Hmix:  Tuple[NDarray, NDarray] = Λmix, Vmix
+
 			# Uprob: Callable[[float], csr]    = quantum.explicit.tsp_problem_unitary(Hprob)
 			
 			# create an initial state
-			initial_state: NDArray = quantum.explicit.tsp_initial(nodes, basis)
+			initial_state: NDArray = quantum.explicit.tsp_initial(n, basis)
 
 
 
 			# create a process callable for the classical optimizer
-			process = classic.hybrid.get_process_linalg(G, (Hmix, Hprob, initial_state), options['p'], nodes, options['problem'])
+			process = classic.hybrid.get_process_linalg(G, (Hmix, Hprob, initial_state), options['p'])
 
 			
 			#######
@@ -107,15 +118,17 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 
 			np.save(export.storage.files['optimal_thetas'].format(**options), res['x'])
 			
-			best_state: NDArray = quantum.explicit.run(res['x'], Hmix, Hprob, initial_state, options['p'])
-			counts = dict(zip([('' if full else '0') + ''.join([str(i) for i in tup]) for tup in itertools.permutations(range(nodes) if full else range(1, nodes+1))],np.real(np.conj(best_state)*best_state)))
+			runtime += d_tm # diagonalization time
+			best_state: NDArray        = quantum.explicit.run(res['x'], Hmix, Hprob, initial_state, options['p'])
+			raw_counts: Dict[str, int] = dict(zip([classic.hamiltonian.mat2bits(classic.hamiltonian.tup2mat(tup)) for tup in basis], np.real(np.conj(best_state)*best_state)))
+			counts = export.reporting.prettify(raw_counts, options['problem'], nodes)
 		else:
 			raise KeyError("Unknown platform '"+ options['platform'] +"'.")
 		
 		if options['print_distributions']:
 			export.distribution.plot(counts, export.storage.files['distributions'].format(**options), solution)
 		export    .distribution.save(counts, export.storage.files['distributions'].format(**options), solution)
-		results.append(export.reporting.evaluate(res, counts, myCircuit, solution, runtime))
+		results.append(export.reporting.evaluate(res, counts, myCircuit if options['platform'] == 'qiskit' else None, solution, runtime))
 		# break # for running a single value only
 	return results, counts, solution, res # TODO: Only results and solution really make sense here.
 
@@ -135,6 +148,9 @@ def vary(this: Union[None, Tuple[()], str, Tuple[str], Tuple[str, str], Tuple[st
 		if how_many:
 			# assert isinstance(this, tuple)
 			this = this[0] # type: ignore
+			if other_options['print_comparisons']:
+				export.comparison.plot(reports, other_options['pmax'], export.storage.files['comparisons'].format(**option_texts))#, export.storage.files['runtimes'].format(**option_texts))
+			export    .comparison.save(reports, other_options['pmax'], export.storage.files['comparisons'].format(**option_texts))#, export.storage.files['runtimes'].format(**option_texts))
 		assert isinstance(this, str), "vary was called with a ill fitting how_many-Parameter for the varied option(s)"
 		for this_option in from_options[this]:
 			options = other_options.copy()

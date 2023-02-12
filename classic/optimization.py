@@ -33,6 +33,10 @@ def get_start_value(pars: int, style: str, qAlgorithm: Optional[str] = None) -> 
 		problem: NDArray[np.float64] = np.array(list(reversed(mixer))) / 100 # gammas
 		# divided by 100 as the rotation factors = edge weights and penalties tend to be of order 10-1000
 		return np.array([problem, mixer]).flatten('F')
+	elif style == "random":
+		return np.random.random_sample(pars) * np.pi / 100
+	elif style == "random_large":
+		return np.random.random_sample(pars) * np.pi / 2
 	else:
 		raise KeyError("Start value style '"+ style +"' not known.")
 

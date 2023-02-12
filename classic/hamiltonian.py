@@ -84,21 +84,6 @@ def evaluator_tsp(n: int, factor: Number) -> Callable[[Choice, nx.Graph], Number
 	return eval_tsp
 
 
-def bits2mat_callable(full: bool, n: int) -> Callable[[str], np.matrix]:
-	def bits2mat(state: str) -> np.matrix:
-		line: int = n if full else n-1
-		assert len(state) == line * line
-
-		bitstring = state[::-1]
-		table: List[str] = []
-		for i in range(line):
-			table.append(bitstring[i*line:(i+1)*line] +('' if full else '0'))
-		if not full:
-			table.append('0'*(n-1) + '1')
-
-		return np.matrix([[int(symbol) for symbol in line] for line in table])
-	return bits2mat
-
 
 
 
@@ -122,8 +107,23 @@ def prettyState(problem: str, bitstring: str, n: int) -> str:
 		return mat2perm(choice)
 	raise KeyError("Unknown problem '"+ problem +"'.")
 
+def bits2mat_callable(full: bool, n: int) -> Callable[[str], np.matrix]:
+	def bits2mat(state: str) -> np.matrix:
+		line: int = n if full else n-1
+		assert len(state) == line * line
+
+		bitstring = state[::-1]
+		table: List[str] = []
+		for i in range(line):
+			table.append(bitstring[i*line:(i+1)*line] +('' if full else '0'))
+		if not full:
+			table.append('0'*(n-1) + '1')
+
+		return np.matrix([[int(symbol) for symbol in line] for line in table])
+	return bits2mat
+
 def mat2perm(binary_table: np.matrix) -> str:
-	lines: Tuple[int, ...] = binary_table.shape
+	lines: Tuple[int, int] = binary_table.shape
 	assert lines[0] == lines[1], "Rectangular binary table"
 	line: int = lines[0]
 	# line = n-1
@@ -180,8 +180,30 @@ def perm2mat(permutation: str) -> np.matrix:
 
 	return np.matrix(npCols).T
 
+def tup2mat(permutation: Tuple, full: bool = True) -> np.matrix:
+	line: int = len(permutation) + int(not full)
+	emptyCol: NDArray = np.zeros(line, dtype=int)
 
+	npCol:       NDArray
+	npCols: List[NDArray] = []
+	for num in permutation:
+		npCol = emptyCol.copy()
+		npCol[num] = 1
+		npCols.append(npCol)
+	if not full:
+		npCol = emptyCol.copy()
+		npCol[line-1] = 1
+		npCols.append(npCol)
+		
+	return np.matrix(npCols).T
 
+def mat2bits(binary_table: np.matrix, full: bool = True) -> str:
+	assert binary_table.dtype == int
+	if not full:
+		binary_table = binary_table[:-1,:-1]
+
+	bitstring = "".join(["".join([str(symbol) for symbol in row]) for row in binary_table.tolist()])
+	return bitstring[::-1]
 #bits2perm(a)
 
 

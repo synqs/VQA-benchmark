@@ -5,24 +5,24 @@ from scipy import sparse
 import sympy
 
 import networkx as nx
+import time as clock
+
 from typing import Tuple, List, Sequence, Callable
 from numpy.typing import NDArray
 
 
-def tsp_problem_hamiltonian(n: int, basis: List[Tuple], G: nx.Graph, problem: str) -> NDArray:
+def tsp_problem_hamiltonian(n: int, basis: List[Tuple], G: nx.Graph, full: bool) -> NDArray:
 	nfac = len(basis)
-	
+
 	diagonals = []
 	for perm in basis:
 		diagonal = 0
 		for nFrom, nTo in zip(perm[:-1], perm[1:]):
 			diagonal += G[nFrom][nTo]['weight']
-		if   problem == 'TSP_full':
+		if full:
 			diagonal += G[perm[-1]][perm[0]]['weight']
-		elif problem == 'TSP':
-			diagonal += G[perm[-1]+1][0]['weight'] + G[0][perm[0]+1]['weight']
 		else:
-			raise KeyError("Unknown problem '"+ problem +"'.")
+			diagonal += G[perm[-1]][n-1]['weight'] + G[n-1][perm[0]]['weight']
 		diagonals.append(diagonal)
 
 	assert len(diagonals) == nfac
@@ -56,12 +56,13 @@ def tsp_mixer_unitary(n: int, basis: List[Tuple]) -> Tuple[NDArray, NDArray]: # 
 	Hamiltonian: NDArray = np.zeros((nfac, nfac))
 
 	# nonzero = []
+	differences: int
 	for k in range(nfac):
 		for j in range(k):
 			differences = 0
-			for m in range(n):
-				different = basis[j][m] != basis[k][m]
-				differences += int(different)
+			for num_j, num_k in zip(basis[j], basis[k]):
+				# different = num_j != num_k
+				differences += int(num_j != num_k)
 				if differences > 2:
 					break
 			if differences == 2:
@@ -143,9 +144,11 @@ def tsp_mixer_unitary(n: int, basis: List[Tuple]) -> Tuple[NDArray, NDArray]: # 
 	# # evs.T = evs.H = evs^-1
 	# # evs @ diag(ews) @ evs.T = Ssum
 	
+	start: float = clock.time()
 	ews, evs = np.linalg.eigh(Hamiltonian)
+	end:   float = clock.time()
 
-	return ews, evs
+	return ews, evs, end - start
 	# # return Rews, Revs
 
 
