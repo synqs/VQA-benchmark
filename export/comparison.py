@@ -31,10 +31,10 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 	plt.rc('figure', titlesize=LARGE_SIZE)  # fontsize of the figure title
 
 	x_labels: range = range(1, maxP+1)
-	fig, (ax1, ax2, ax4) = plt.subplots(3, 1, sharex=True,figsize=(12,24))
+	fig, (ax1, ax2, ax4) = plt.subplots(3, 1, sharex=True,figsize=(16,24))
 	
-	plt.subplots_adjust(left=0.20,
-						right=0.94, 
+	plt.subplots_adjust(left=0.275,
+						right=0.83, 
 						bottom=0.075, 
 						top=0.92, 
 						hspace=0.2)
