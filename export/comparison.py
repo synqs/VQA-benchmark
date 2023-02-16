@@ -57,8 +57,20 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 		try:
 			properties.remove(varied_property)
 		except ValueError:
-			print(varied_property +" does not appear in "+ str(properties))
-			file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
+			# qAlgoVariant: bool = False
+			if varied_property == 'qAlgorithm':
+				try:
+					properties.remove('qAlgorithms')
+					# qAlgoVariant = True
+				except ValueError:
+					try:
+						properties.remove('VQEs')
+						# qAlgoVariant = True
+					except ValueError:
+						raise Exception("qAlgorithm missing in file name.")
+			else:
+				print(varied_property +" does not appear in "+ str(properties))
+				file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
 		known_properties = {'cAlgorithm':	'classical optimizers',
 							'distances':	'graphs',
 							'hardware':		'hardware',
@@ -132,7 +144,7 @@ def save(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 	properties: List[str] = file.split(os.sep)[-1].replace('.png', '').split('-')[:-1]
 	varied: Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]] = reports[0][2]
 	for varied_property in varied:
-		if varied_property not in properties:
+		if varied_property not in properties and varied_property != 'qAlgorithm':
 			file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
 
 	all_success_rates    : List[List[Optional[Number]]] = []
