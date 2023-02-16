@@ -113,6 +113,11 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 	# ax3.set_xticks(x_labels)
 	ax4.set_xticks(x_labels)
 
+	ax1.tick_params(right=True, labelright=False)
+	ax2.tick_params(right=True, labelright=False)
+	# ax3.tick_params(right=True, labelright=False)
+	ax4.tick_params(right=True, labelright=False)
+
 	for report, options, report_varied in reports:
 		results, counts, sol, res = report
 		run = ', '.join(options)
