@@ -31,10 +31,10 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 	plt.rc('figure', titlesize=LARGE_SIZE)  # fontsize of the figure title
 
 	x_labels: range = range(1, maxP+1)
-	fig, (ax1, ax2, ax4) = plt.subplots(3, 1, sharex=True,figsize=(12,24))
+	fig, (ax1, ax2, ax4) = plt.subplots(3, 1, sharex=True,figsize=(16,24))
 	
-	plt.subplots_adjust(left=0.20,
-						right=0.94, 
+	plt.subplots_adjust(left=0.275,
+						right=0.83, 
 						bottom=0.075, 
 						top=0.92, 
 						hspace=0.2)
@@ -57,8 +57,20 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 		try:
 			properties.remove(varied_property)
 		except ValueError:
-			print(varied_property +" does not appear in "+ str(properties))
-			file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
+			# qAlgoVariant: bool = False
+			if varied_property == 'qAlgorithm':
+				try:
+					properties.remove('qAlgorithms')
+					# qAlgoVariant = True
+				except ValueError:
+					try:
+						properties.remove('VQEs')
+						# qAlgoVariant = True
+					except ValueError:
+						raise Exception("qAlgorithm missing in file name.")
+			else:
+				print(varied_property +" does not appear in "+ str(properties))
+				file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
 		known_properties = {'cAlgorithm':	'classical optimizers',
 							'distances':	'graphs',
 							'hardware':		'hardware',
@@ -101,6 +113,11 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 	# ax3.set_xticks(x_labels)
 	ax4.set_xticks(x_labels)
 
+	ax1.tick_params(right=True, labelright=False)
+	ax2.tick_params(right=True, labelright=False)
+	# ax3.tick_params(right=True, labelright=False)
+	ax4.tick_params(right=True, labelright=False)
+
 	for report, options, report_varied in reports:
 		results, counts, sol, res = report
 		run = ', '.join(options)
@@ -132,7 +149,7 @@ def save(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 	properties: List[str] = file.split(os.sep)[-1].replace('.png', '').split('-')[:-1]
 	varied: Union[Tuple[()], Tuple[str], Tuple[str, str], Tuple[str, str, str]] = reports[0][2]
 	for varied_property in varied:
-		if varied_property not in properties:
+		if varied_property not in properties and varied_property != 'qAlgorithm':
 			file = '-'.join(file.split('-')[:-1]) +'-'+ varied_property +'-'+ file.split('-')[-1]
 
 	all_success_rates    : List[List[Optional[Number]]] = []

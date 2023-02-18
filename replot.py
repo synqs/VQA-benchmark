@@ -11,19 +11,24 @@ import os
 import numpy as np
 
 
-folder: str = folders['comp'] # overview plots
+folder: str = folders['comp'].replace("img", "data"+ os.sep +"img") # overview plot data
 for image in os.scandir(folder):
 	if image.is_dir():
 		continue
-	reports, maxP, _ = np.load(image.path.replace("img", "data"+ os.sep +"img").replace(".png", "_all.npy"), allow_pickle=True) # _ = fileName
+	if "_all.npy" not in image.path:
+		continue
+	try:
+		reports, maxP, _ = np.load(image.path, allow_pickle=True) # _ = fileName
+	except FileNotFoundError:
+		continue
 	# # print(folder + image, 'reports', maxP, fileName)
 	# exceptions = ['allqAlgorithm-MCP-small-4.png', 'allqAlgorithm-MCP-tiny-4.png', 'VQEs-MCP-large-4.png']
 	# assert fileName == image.path or image.name in exceptions, (fileName, folder, image.name)
 	# imgTime = - 1645000000 + os.path.getmtime(image.path)
 	# datTime = - 1645000000 + os.path.getmtime(image.path.replace("img", "data"+ os.sep +"img").replace(".png", "_all.npy"))
 
-	if image.name == 'allqAlgorithm-MCP-tiny-4.png':
-		reports = reversed(reports)
+	# if image.name == 'allqAlgorithm-MCP-tiny-4.png':
+	# 	reports = reversed(reports)
 	# print(imgTime, datTime, imgTime - datTime)
 	# # if abs(imgTime - datTime) > 1:
 	# # 	print(image.path, image.path.replace("img", "data"+ os.sep +"img").replace(".png", "_all.npy"))
@@ -31,7 +36,8 @@ for image in os.scandir(folder):
 
 	varied = reports[0][2]
 	# print(varied)
-	export.comparison.plot(reports, maxP, image.path)
+	export.comparison.plot(reports, maxP, image.path.replace("data"+ os.sep +"img", "img").replace("_all.npy", ".png"))
+	print("Updated image: "+ image.path.replace("data"+ os.sep +"img", "img").replace("_all.npy", ".png"))
 	
 
 
