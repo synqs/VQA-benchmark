@@ -12,12 +12,12 @@ options: Dict[str, Union[str, int, float, bool]] = {
 	'shots':					1024,					# shots per quantum run
 	'pmax':						4,						# maximal number of evolution steps
 	'qubase':					"qubit",				# qubit, qudit (not implemented)
-	'd':						10,						# 2, 3, ...
-	'platform':					"qiskit",				# qiskit (circuit), linalg (matrices), qutip (matrices), sympy (formula for expec. value)
-	'qAlgorithm':				"VQE",					# QAOA, cQAOA, VQE_qiskit_linear, VQE_qiskit_all, VQE_linear_cz, VQE_all_cz
+	# 'd':						10,						# 2, 3, ...
+	'platform':					"qiskit",				# qiskit (circuit), linalg (matrices), (not implemented: qutip, sympy)
+	'qAlgorithm':				"VQE",  				# QAOA, cQAOA, VQE_qiskit_linear, VQE_qiskit_all, VQE_linear_cz, VQE_all_cz
 	'hardware':					"qasm_simulator",		# qasm_simulator, statevector_simulator, ibmq_quito
 	'cAlgorithm':				"powell",				# powell, Something_with_gradients?, something_own
-	'x0':						"random",				# standard (decrease for VQE, linear_annealing for QAOA), decrease, zeros, ones, increase, large, linear_annealing
+	'x0':						"standard",				# standard (decrease for VQE, linear_annealing for QAOA), decrease, zeros, ones, increase, large, linear_annealing, random
 	'print_circuits':			False,					# True, False
 	'print_distributions':		True,					# True, False
 	'print_comparisons':		True,					# True, False
@@ -25,8 +25,9 @@ options: Dict[str, Union[str, int, float, bool]] = {
 
 np.random.seed(42)
 
-final_result: int = single_run(options)
-# final_result: int = vary('platform', all_options, options)
+
+# final_result: int = single_run(options)
+final_result: int = vary('problem', all_options, options)
 # final_result: int = vary(('qAlgorithm', 'size'), all_options, options, how_many=2)
 
 # print(final_result)

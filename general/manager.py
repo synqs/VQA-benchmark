@@ -118,7 +118,7 @@ def run_optimizer(options: Dict[str, Any]) -> Tuple[List[Result], Dict[str, int]
 
 			np.save(export.storage.files['optimal_thetas'].format(**options), res['x'])
 			
-			runtime += d_tm # diagonalization time
+			runtime = runtime * options['shots'] + d_tm # make a fairer comparison value, d_tm = diagonalization time
 			best_state: NDArray        = quantum.explicit.run(res['x'], Hmix, Hprob, initial_state, options['p'])
 			raw_counts: Dict[str, int] = dict(zip([classic.hamiltonian.mat2bits(classic.hamiltonian.tup2mat(tup)) for tup in basis], np.real(np.conj(best_state)*best_state)))
 			counts = export.reporting.prettify(raw_counts, options['problem'], nodes)
@@ -144,13 +144,13 @@ def vary(this: Union[None, Tuple[()], str, Tuple[str], Tuple[str, str], Tuple[st
 	if this is None or this == ():
 		report = run_optimizer(other_options), (), ()
 		reports.append(report)
+		if other_options['print_comparisons']:
+			export.comparison.plot(reports, other_options['pmax'], export.storage.files['comparisons'].format(**option_texts))#, export.storage.files['runtimes'].format(**option_texts))
+		export    .comparison.save(reports, other_options['pmax'], export.storage.files['comparisons'].format(**option_texts))#, export.storage.files['runtimes'].format(**option_texts))
 	elif how_many is None or how_many == 1:
 		if how_many:
 			# assert isinstance(this, tuple)
 			this = this[0] # type: ignore
-			if other_options['print_comparisons']:
-				export.comparison.plot(reports, other_options['pmax'], export.storage.files['comparisons'].format(**option_texts))#, export.storage.files['runtimes'].format(**option_texts))
-			export    .comparison.save(reports, other_options['pmax'], export.storage.files['comparisons'].format(**option_texts))#, export.storage.files['runtimes'].format(**option_texts))
 		assert isinstance(this, str), "vary was called with a ill fitting how_many-Parameter for the varied option(s)"
 		for this_option in from_options[this]:
 			options = other_options.copy()
