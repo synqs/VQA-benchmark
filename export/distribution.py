@@ -31,12 +31,31 @@ def plot(c: Dict[str, int], file: str, solution: Solution) -> None:
 	plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 	# plt.rc('figure', labelsize=MEDIUM_SIZE)  # fontsize of the figure labels
 	plt.rc('figure', titlesize=LARGE_SIZE)  # fontsize of the figure title
-
-	fig, ax = plt.subplots(figsize=(16, 9)) # Create a figure containing a single axes.
-	plt.subplots_adjust(left=0.10,
-						right=0.97, 
-						bottom=0.25, 
-						top=0.99) # 0.90 for title
+	
+	if len(c) < 10:
+		fig, ax = plt.subplots(figsize=(16, 9)) # Create a figure containing a single axes.
+		plt.subplots_adjust(left=0.15,
+							right=0.97, 
+							bottom=0.25, 
+							top=0.99) # 0.90 for title
+	elif len(c) < 20:
+		fig, ax = plt.subplots(figsize=(20, 9)) # Create a figure containing a single axes.
+		plt.subplots_adjust(left=0.0875,
+							right=0.98, 
+							bottom=0.25, 
+							top=0.99) # 0.90 for title
+	elif len(c) < 100:
+		fig, ax = plt.subplots(figsize=(25, 9)) # Create a figure containing a single axes.
+		plt.subplots_adjust(left=0.07,
+							right=0.99, 
+							bottom=0.25, 
+							top=0.99) # 0.90 for title
+	else:
+		fig, ax = plt.subplots(figsize=(16, 9)) # Create a figure containing a single axes.
+		plt.subplots_adjust(left=0.10,
+							right=0.97, 
+							bottom=0.25, 
+							top=0.99) # 0.90 for title
 	
 	ax.bar(range(len(c)), c.values(), tick_label=list(c.keys()), color=colors)
 	plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
