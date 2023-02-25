@@ -10,7 +10,7 @@ options: Dict[str, Union[str, int, float, bool]] = {
 	'distances':				1,						# 1, 2 (only possible for small)
 	'penalty':					100,  					# penalty for invalid tsp states
 	'shots':					1024,					# shots per quantum run
-	'pmax':						4,						# maximal number of evolution steps
+	'pmax':						3,						# maximal number of evolution steps
 	'qubase':					"qubit",				# qubit, qudit (not implemented)
 	# 'd':						10,						# 2, 3, ...
 	'platform':					"qiskit",				# qiskit (circuit), linalg (matrices), (not implemented: qutip, sympy)
@@ -18,16 +18,16 @@ options: Dict[str, Union[str, int, float, bool]] = {
 	'hardware':					"qasm_simulator",		# qasm_simulator, statevector_simulator, ibmq_quito
 	'cAlgorithm':				"powell",				# powell, Something_with_gradients?, something_own
 	'x0':						"standard",				# standard (decrease for VQE, linear_annealing for QAOA), decrease, zeros, ones, increase, large, linear_annealing, random
-	'print_circuits':			False,					# True, False
-	'print_distributions':		True,					# True, False
-	'print_comparisons':		True,					# True, False
+	'print_circuits':			True,					# True, False
+	'print_distributions':		False,					# True, False
+	'print_comparisons':		False,					# True, False
 }
 
 np.random.seed(42)
 
 
-# final_result: int = single_run(options)
-final_result: int = vary('problem', all_options, options)
+final_result: int = single_run(options)
+# final_result: int = vary('problem', all_options, options)
 # final_result: int = vary(('qAlgorithm', 'size'), all_options, options, how_many=2)
 
 # print(final_result)

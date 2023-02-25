@@ -75,7 +75,7 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 							'distances':	'graphs',
 							'hardware':		'hardware',
 							'penalty':		'penalties',
-							'platform':		'algorithms and platforms', # TODO weil bisher nur der neue algorithmus auf der neuen Plattform geht.
+							'platform':		'platforms',
 							'problem':		'problems',
 							'qAlgorithm':	'quantum algorithms',
 							'shots':		'shots per simulation',
@@ -96,7 +96,8 @@ def plot(reports: List[Tuple[Tuple[List[Result], Dict[str, int], Solution, Optim
 		v_properties = varied_properties[0]
 	
 
-	fig.suptitle((v_properties.capitalize() +' in ' if vlen else '') + ' - '.join(properties))
+	fig.suptitle(((v_properties.capitalize() +' in ' if vlen else '') + ' - '.join(properties)).replace('cQAOA', 'TSP-QAOA'))
+	# fig.suptitle('Platforms in')
 	fig.supxlabel('Number of quantum circuit layers $p$', fontsize=MEDIUM_SIZE)
 	ax1.set_title('Success rates',             pad=12)
 	ax2.set_title('Normalized average energy', pad=12)
